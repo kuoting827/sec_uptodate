@@ -7,56 +7,50 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f7f7f5;--surface:#fff;--surface2:#f1f0ed;
-  --border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.18);
-  --text:#1a1a18;--text2:#6b6b67;--text3:#a0a09c;
-  --green:#2d7d46;--red:#c0392b;--red-bg:#fdecea;
-  --orange:#c47b00;--blue-bg:#e8f1fb;
-  --r:10px;--rl:14px
+  --bg:#f7f7f5;--sur:#fff;--sur2:#f1f0ed;
+  --bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.18);
+  --tx:#1a1a18;--tx2:#6b6b67;--tx3:#a0a09c;
+  --gn:#2d7d46;--rd:#c0392b;--rdbg:#fdecea;--or:#c47b00;--blbg:#e8f1fb
 }
 @media(prefers-color-scheme:dark){:root{
-  --bg:#141412;--surface:#1e1e1b;--surface2:#272724;
-  --border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.18);
-  --text:#f0f0ec;--text2:#9a9a94;--text3:#5a5a56;
-  --green:#4caf70;--red:#e05a4a;--red-bg:#2b100d;
-  --orange:#e0a030;--blue-bg:#0d1e33
+  --bg:#141412;--sur:#1e1e1b;--sur2:#272724;
+  --bd:rgba(255,255,255,.1);--bd2:rgba(255,255,255,.18);
+  --tx:#f0f0ec;--tx2:#9a9a94;--tx3:#5a5a56;
+  --gn:#4caf70;--rd:#e05a4a;--rdbg:#2b100d;--or:#e0a030;--blbg:#0d1e33
 }}
-body{font-family:'Helvetica Neue','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem 1rem}
+body{font-family:'Helvetica Neue','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:2rem 1rem}
 .wrap{max-width:1000px;margin:0 auto}
 h1{font-size:22px;font-weight:600;letter-spacing:-.3px;margin-bottom:4px}
-.sub{font-size:13px;color:var(--text2);margin-bottom:1.75rem}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-@media(max-width:500px){.grid3{grid-template-columns:1fr 1fr}.grid3 .mc:last-child{grid-column:1/-1}}
-.mc{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
-.mc-label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
-.mc-wrap{position:relative;min-height:34px}
-.mc-disp{font-size:22px;font-weight:600;color:var(--text);line-height:1.35;pointer-events:none;user-select:none}
-.mc-disp.dim{color:var(--text3);font-weight:400}
-.mc-inp{position:absolute;inset:0;width:100%;font-size:22px;font-weight:600;color:transparent;caret-color:var(--text);background:transparent;border:none;outline:none;font-family:inherit}
-.mc-val{font-size:22px;font-weight:600;color:var(--text);line-height:1.35}
-.mc.neg .mc-val{color:var(--red)}
-.card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--rl);overflow:hidden}
-.tscroll{overflow-x:auto}
+.sub{font-size:13px;color:var(--tx2);margin-bottom:1.75rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+@media(max-width:500px){.g3{grid-template-columns:1fr 1fr}.g3>div:last-child{grid-column:1/-1}}
+.mc{background:var(--sur);border:.5px solid var(--bd);border-radius:10px;padding:14px 16px}
+.mc-lbl{font-size:11px;font-weight:500;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+.mc-rel{position:relative;min-height:34px}
+.mc-show{font-size:22px;font-weight:600;color:var(--tx);line-height:1.35;pointer-events:none;user-select:none;min-height:34px}
+.mc-show.dim{color:var(--tx3);font-weight:400}
+.mc-hide{position:absolute;inset:0;width:100%;font-size:22px;font-weight:600;color:transparent;caret-color:var(--tx);background:transparent;border:none;outline:none;font-family:inherit}
+.mc-out{font-size:22px;font-weight:600;color:var(--tx);line-height:1.35;min-height:34px}
+.neg .mc-out{color:var(--rd)}
+.card{background:var(--sur);border:.5px solid var(--bd);border-radius:14px;overflow:hidden}
+.scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px;table-layout:fixed}
-col.n{width:115px}col.q{width:58px}col.mu{width:72px}col.co{width:85px}col.pr{width:85px}col.pn{width:110px}col.po{width:110px}col.ra{width:78px}col.de{width:40px}
-thead th{background:var(--surface2);font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;padding:10px;text-align:left;border-bottom:.5px solid var(--border);white-space:nowrap}
-tbody tr{border-bottom:.5px solid var(--border)}
+.cn{width:115px}.cq{width:58px}.cm{width:72px}.cc{width:85px}.cp{width:85px}.cu{width:110px}.cs{width:110px}.cr{width:78px}.cd{width:40px}
+thead th{background:var(--sur2);font-size:11px;font-weight:500;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;padding:10px;text-align:left;border-bottom:.5px solid var(--bd);white-space:nowrap}
+tbody tr{border-bottom:.5px solid var(--bd)}
 tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--surface2)}
+tbody tr:hover{background:var(--sur2)}
 td{padding:6px 10px;vertical-align:middle}
-.ti{width:100%;background:transparent;border:none;outline:none;font-size:13px;color:var(--text);font-family:inherit}
-.ti:focus{background:var(--blue-bg);border-radius:5px;padding:2px 5px;margin:-2px -5px}
-.cv{font-size:13px;color:var(--text2)}
-.gn{color:var(--green);font-weight:500}
-.rd{color:var(--red);font-weight:500}
-.or{color:var(--orange);font-weight:500}
-tfoot td{background:var(--surface2);border-top:.5px solid var(--border2);padding:9px 10px;font-size:13px;font-weight:600;color:var(--text)}
-.xbtn{background:none;border:none;cursor:pointer;color:var(--text3);width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin:auto;font-size:14px;line-height:1;transition:background .15s,color .15s}
-.xbtn:hover{background:var(--red-bg);color:var(--red)}
-.bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:.5px solid var(--border);flex-wrap:wrap;gap:8px}
-.addbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;font-family:inherit;color:var(--text);background:var(--surface2);border:.5px solid var(--border2);border-radius:8px;padding:6px 14px;cursor:pointer;transition:background .15s}
-.addbtn:hover{filter:brightness(.95)}
-.hint{font-size:12px;color:var(--text3)}
+.ti{width:100%;background:transparent;border:none;outline:none;font-size:13px;color:var(--tx);font-family:inherit}
+.ti:focus{background:var(--blbg);border-radius:5px;padding:2px 5px;margin:-2px -5px}
+.cv{font-size:13px;color:var(--tx2)}
+.gn{color:var(--gn);font-weight:500}.rd{color:var(--rd);font-weight:500}.or{color:var(--or);font-weight:500}
+tfoot td{background:var(--sur2);border-top:.5px solid var(--bd2);padding:9px 10px;font-size:13px;font-weight:600;color:var(--tx)}
+.xbtn{background:none;border:none;cursor:pointer;color:var(--tx3);width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin:auto;font-size:14px;transition:background .15s,color .15s}
+.xbtn:hover{background:var(--rdbg);color:var(--rd)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:.5px solid var(--bd);flex-wrap:wrap;gap:8px}
+.addbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;font-family:inherit;color:var(--tx);background:var(--sur2);border:.5px solid var(--bd2);border-radius:8px;padding:6px 14px;cursor:pointer}
+.hint{font-size:12px;color:var(--tx3)}
 </style>
 </head>
 <body>
@@ -64,31 +58,35 @@ tfoot td{background:var(--surface2);border-top:.5px solid var(--border2);padding
   <h1>期貨部位追蹤表</h1>
   <p class="sub">即時計算未實現損益、現貨部位與部位佔比</p>
 
-  <div class="grid3">
+  <div class="g3">
     <div class="mc">
-      <span class="mc-label">權益數</span>
-      <div class="mc-wrap">
-        <div class="mc-disp dim" id="eqD">0</div>
-        <input class="mc-inp" type="number" id="eq" placeholder="0">
+      <span class="mc-lbl">權益數</span>
+      <div class="mc-rel">
+        <div class="mc-show dim" id="eqShow">0</div>
+        <input class="mc-hide" type="number" id="eqInp" placeholder="0">
       </div>
     </div>
     <div class="mc">
-      <span class="mc-label">原始保證金</span>
-      <div class="mc-wrap">
-        <div class="mc-disp dim" id="mgD">0</div>
-        <input class="mc-inp" type="number" id="mg" placeholder="0">
+      <span class="mc-lbl">原始保證金</span>
+      <div class="mc-rel">
+        <div class="mc-show dim" id="mgShow">0</div>
+        <input class="mc-hide" type="number" id="mgInp" placeholder="0">
       </div>
     </div>
     <div class="mc" id="dropCard">
-      <span class="mc-label">可跌部位</span>
-      <div class="mc-val" id="dropVal">—</div>
+      <span class="mc-lbl">可跌部位</span>
+      <div class="mc-out" id="dropOut">—</div>
     </div>
   </div>
 
   <div class="card">
-    <div class="tscroll">
+    <div class="scroll">
       <table>
-        <colgroup><col class="n"><col class="q"><col class="mu"><col class="co"><col class="pr"><col class="pn"><col class="po"><col class="ra"><col class="de"></colgroup>
+        <colgroup>
+          <col class="cn"><col class="cq"><col class="cm">
+          <col class="cc"><col class="cp"><col class="cu">
+          <col class="cs"><col class="cr"><col class="cd">
+        </colgroup>
         <thead>
           <tr>
             <th>標的名稱</th><th>口數</th><th>一口點數</th>
@@ -96,11 +94,14 @@ tfoot td{background:var(--surface2);border-top:.5px solid var(--border2);padding
             <th>現貨部位</th><th>部位佔比</th><th></th>
           </tr>
         </thead>
-        <tbody id="tb"></tbody>
+        <tbody id="tbody"></tbody>
         <tfoot>
           <tr>
-            <td colspan="5" style="color:var(--text2);font-weight:500">合計</td>
-            <td id="fPnl">—</td><td id="fPos">—</td><td id="fRat">—</td><td></td>
+            <td colspan="5" style="color:var(--tx2);font-weight:500">合計</td>
+            <td id="fPnl">—</td>
+            <td id="fPos">—</td>
+            <td id="fRat">—</td>
+            <td></td>
           </tr>
         </tfoot>
       </table>
@@ -113,145 +114,220 @@ tfoot td{background:var(--surface2);border-top:.5px solid var(--border2);padding
 </div>
 
 <script>
-(function(){
-  var rows=[], uid=0;
+var rowIds = [];
+var uid = 0;
 
-  function mp(name){
-    var n=(name||'').trim();
-    if(n.slice(0,2)==='微台') return 10;
-    if(n.slice(0,2)==='小台') return 50;
-    if(n.slice(0,2)==='台指') return 200;
-    if(n.slice(0,2)==='小型') return 100;
-    return 2000;
+function getMultiplier(name) {
+  var n = name ? name.trim() : '';
+  var prefix = n.slice(0, 2);
+  if (prefix === '微台') return 10;
+  if (prefix === '小台') return 50;
+  if (prefix === '台指') return 200;
+  if (prefix === '小型') return 100;
+  return 2000;
+}
+
+function formatNum(n) {
+  if (typeof n !== 'number' || isNaN(n)) return '—';
+  return Math.round(n).toLocaleString('zh-TW');
+}
+
+function updateSummaryDisplay(inpId, showId) {
+  var inp = document.getElementById(inpId);
+  var show = document.getElementById(showId);
+  if (!inp || !show) return;
+  var raw = inp.value.trim();
+  var v = parseFloat(raw);
+  if (raw === '' || isNaN(v)) {
+    show.textContent = '0';
+    show.className = 'mc-show dim';
+  } else {
+    show.textContent = Math.round(v).toLocaleString('zh-TW');
+    show.className = 'mc-show';
+  }
+}
+
+function recalcAll() {
+  updateSummaryDisplay('eqInp', 'eqShow');
+  updateSummaryDisplay('mgInp', 'mgShow');
+
+  var eqRaw = document.getElementById('eqInp').value.trim();
+  var mgRaw = document.getElementById('mgInp').value.trim();
+  var equity = eqRaw !== '' ? parseFloat(eqRaw) : NaN;
+  var margin = mgRaw !== '' ? parseFloat(mgRaw) : NaN;
+
+  var dropOut = document.getElementById('dropOut');
+  var dropCard = document.getElementById('dropCard');
+  if (!isNaN(equity) || !isNaN(margin)) {
+    var eq = isNaN(equity) ? 0 : equity;
+    var mg = isNaN(margin) ? 0 : margin;
+    var drop = eq - mg;
+    dropOut.textContent = formatNum(drop);
+    if (drop < 0) dropCard.classList.add('neg');
+    else dropCard.classList.remove('neg');
+  } else {
+    dropOut.textContent = '—';
+    dropCard.classList.remove('neg');
   }
 
-  function fmt(n){
-    return (isNaN(n)||n===null||n===undefined)?'—':Math.round(n).toLocaleString('zh-TW');
-  }
+  var totalPnl = 0, totalPos = 0, hasPnl = false, hasPos = false;
+  var eq2 = isNaN(equity) ? 0 : equity;
 
-  function g(id){ return document.getElementById(id); }
+  for (var i = 0; i < rowIds.length; i++) {
+    var id = rowIds[i];
 
-  function syncDisp(inpId, dispId){
-    var inp=g(inpId), disp=g(dispId);
-    if(!inp||!disp) return;
-    var v=parseFloat(inp.value);
-    if(inp.value===''||isNaN(v)){
-      disp.textContent='0'; disp.className='mc-disp dim';
+    var nameInp  = document.getElementById('name_' + id);
+    var qtyInp   = document.getElementById('qty_' + id);
+    var costInp  = document.getElementById('cost_' + id);
+    var priceInp = document.getElementById('price_' + id);
+    var multSpan = document.getElementById('mult_' + id);
+    var pnlSpan  = document.getElementById('pnl_' + id);
+    var posSpan  = document.getElementById('pos_' + id);
+    var ratSpan  = document.getElementById('rat_' + id);
+
+    if (!nameInp) continue;
+
+    var name  = nameInp.value;
+    var mult  = getMultiplier(name);
+    var qtyV  = qtyInp.value.trim();
+    var costV = costInp.value.trim();
+    var prcV  = priceInp.value.trim();
+    var qty   = qtyV   !== '' ? parseFloat(qtyV)  : NaN;
+    var cost  = costV  !== '' ? parseFloat(costV) : NaN;
+    var price = prcV   !== '' ? parseFloat(prcV)  : NaN;
+
+    multSpan.textContent = mult.toLocaleString('zh-TW');
+
+    var okQ = !isNaN(qty) && qty !== 0;
+    var okP = !isNaN(price);
+    var okC = !isNaN(cost);
+
+    if (okQ && okP && okC) {
+      var pnl = (price - cost) * qty * mult;
+      totalPnl += pnl;
+      hasPnl = true;
+      pnlSpan.textContent = formatNum(pnl);
+      pnlSpan.className = pnl > 0 ? 'cv gn' : pnl < 0 ? 'cv rd' : 'cv';
     } else {
-      disp.textContent=Math.round(v).toLocaleString('zh-TW'); disp.className='mc-disp';
+      pnlSpan.textContent = '—';
+      pnlSpan.className = 'cv';
+    }
+
+    if (okQ && okP) {
+      var pos = qty * mult * price;
+      totalPos += pos;
+      hasPos = true;
+      posSpan.textContent = formatNum(pos);
+      if (eq2 > 0) {
+        var rat = (pos / eq2) * 100;
+        ratSpan.textContent = rat.toFixed(1) + '%';
+        ratSpan.className = rat > 60 ? 'cv rd' : rat > 30 ? 'cv or' : 'cv gn';
+      } else {
+        ratSpan.textContent = '—';
+        ratSpan.className = 'cv';
+      }
+    } else {
+      posSpan.textContent = '—';
+      ratSpan.textContent = '—';
+      ratSpan.className = 'cv';
     }
   }
 
-  function calc(){
-    syncDisp('eq','eqD');
-    syncDisp('mg','mgD');
-    var equity=parseFloat(g('eq').value)||0;
-    var margin=parseFloat(g('mg').value)||0;
-    var drop=equity-margin;
-    g('dropVal').textContent=(equity||margin)?fmt(drop):'—';
-    if(drop<0&&(equity||margin)) g('dropCard').classList.add('neg');
-    else g('dropCard').classList.remove('neg');
+  var fPnl = document.getElementById('fPnl');
+  var fPos = document.getElementById('fPos');
+  var fRat = document.getElementById('fRat');
 
-    var tPnl=0,tPos=0,aPnl=false,aPos=false;
+  if (hasPnl) {
+    fPnl.textContent = formatNum(totalPnl);
+    fPnl.style.color = totalPnl > 0 ? 'var(--gn)' : totalPnl < 0 ? 'var(--rd)' : '';
+  } else {
+    fPnl.textContent = '—';
+    fPnl.style.color = '';
+  }
 
-    for(var i=0;i<rows.length;i++){
-      var id=rows[i];
-      var nEl=g('n'+id), qEl=g('q'+id), cEl=g('c'+id), pEl=g('p'+id);
-      var mEl=g('m'+id), uEl=g('u'+id), sEl=g('s'+id), tEl=g('t'+id);
-      if(!nEl) continue;
-
-      var name=nEl.value||'';
-      var qty=qEl.value!==''?parseFloat(qEl.value):NaN;
-      var cost=cEl.value!==''?parseFloat(cEl.value):NaN;
-      var price=pEl.value!==''?parseFloat(pEl.value):NaN;
-      var m=mp(name);
-
-      mEl.textContent=m.toLocaleString('zh-TW');
-
-      var okQty=!isNaN(qty)&&qty!==0;
-      var okPrc=!isNaN(price);
-      var okCst=!isNaN(cost);
-
-      if(okQty&&okPrc&&okCst){
-        var pnl=(price-cost)*qty*m;
-        tPnl+=pnl; aPnl=true;
-        uEl.textContent=fmt(pnl);
-        uEl.className='cv'+(pnl>0?' gn':pnl<0?' rd':'');
-      } else {
-        uEl.textContent='—'; uEl.className='cv';
-      }
-
-      if(okQty&&okPrc){
-        var pos=qty*m*price;
-        tPos+=pos; aPos=true;
-        sEl.textContent=fmt(pos);
-        if(equity>0){
-          var rat=(pos/equity)*100;
-          tEl.textContent=rat.toFixed(1)+'%';
-          tEl.className='cv'+(rat>60?' rd':rat>30?' or':' gn');
-        } else { tEl.textContent='—'; tEl.className='cv'; }
-      } else {
-        sEl.textContent='—';
-        tEl.textContent='—'; tEl.className='cv';
-      }
+  if (hasPos) {
+    fPos.textContent = formatNum(totalPos);
+    if (eq2 > 0) {
+      var totRat = (totalPos / eq2) * 100;
+      fRat.textContent = totRat.toFixed(1) + '%';
+      fRat.style.color = totRat > 60 ? 'var(--rd)' : totRat > 30 ? 'var(--or)' : 'var(--gn)';
+    } else {
+      fRat.textContent = '—';
+      fRat.style.color = '';
     }
+  } else {
+    fPos.textContent = '—';
+    fRat.textContent = '—';
+    fRat.style.color = '';
+  }
+}
 
-    var fp=g('fPnl'),fs=g('fPos'),ft=g('fRat');
-    if(aPnl){
-      fp.textContent=fmt(tPnl);
-      fp.style.color=tPnl>0?'var(--green)':tPnl<0?'var(--red)':'var(--text)';
-    } else { fp.textContent='—'; fp.style.color=''; }
-    if(aPos){
-      fs.textContent=fmt(tPos);
-      if(equity>0){
-        var tr=(tPos/equity)*100;
-        ft.textContent=tr.toFixed(1)+'%';
-        ft.style.color=tr>60?'var(--red)':tr>30?'var(--orange)':'var(--green)';
-      } else { ft.textContent='—'; ft.style.color=''; }
-    } else { fs.textContent='—'; ft.textContent='—'; ft.style.color=''; }
+function makeInput(type, id, placeholder, cls) {
+  var inp = document.createElement('input');
+  inp.type = type;
+  inp.id = id;
+  inp.placeholder = placeholder;
+  inp.className = cls;
+  inp.addEventListener('input', recalcAll);
+  return inp;
+}
+
+function makeSpan(id, text, cls) {
+  var s = document.createElement('span');
+  s.id = id;
+  s.textContent = text;
+  s.className = cls;
+  return s;
+}
+
+function addRow() {
+  uid++;
+  var id = uid;
+  rowIds.push(id);
+
+  var tbody = document.getElementById('tbody');
+  var tr = document.createElement('tr');
+  tr.id = 'row_' + id;
+
+  function td(child) {
+    var cell = document.createElement('td');
+    if (child) cell.appendChild(child);
+    return cell;
   }
 
-  function addRow(){
-    var id=++uid;
-    rows.push(id);
-    var tb=g('tb');
-    var tr=document.createElement('tr');
-    tr.id='row'+id;
-    tr.innerHTML=
-      '<td><input class="ti" type="text"   id="n'+id+'" placeholder="小台202506"></td>'+
-      '<td><input class="ti" type="number" id="q'+id+'" placeholder="1"></td>'+
-      '<td><span class="cv" id="m'+id+'">2,000</span></td>'+
-      '<td><input class="ti" type="number" id="c'+id+'" placeholder="0"></td>'+
-      '<td><input class="ti" type="number" id="p'+id+'" placeholder="0"></td>'+
-      '<td><span class="cv" id="u'+id+'">—</span></td>'+
-      '<td><span class="cv" id="s'+id+'">—</span></td>'+
-      '<td><span class="cv" id="t'+id+'">—</span></td>'+
-      '<td><button class="xbtn" data-rid="'+id+'">✕</button></td>';
-    tb.appendChild(tr);
+  var delBtn = document.createElement('button');
+  delBtn.className = 'xbtn';
+  delBtn.textContent = '✕';
+  delBtn.setAttribute('data-id', id);
+  delBtn.addEventListener('click', function() {
+    var rid = parseInt(this.getAttribute('data-id'), 10);
+    rowIds = rowIds.filter(function(x) { return x !== rid; });
+    var row = document.getElementById('row_' + rid);
+    if (row) row.parentNode.removeChild(row);
+    recalcAll();
+  });
 
-    tr.querySelector('.xbtn').addEventListener('click', function(){
-      var rid=parseInt(this.getAttribute('data-rid'),10);
-      rows=rows.filter(function(x){ return x!==rid; });
-      var el=g('row'+rid);
-      if(el) el.parentNode.removeChild(el);
-      calc();
-    });
+  tr.appendChild(td(makeInput('text',   'name_'  + id, '小台202506', 'ti')));
+  tr.appendChild(td(makeInput('number', 'qty_'   + id, '1',          'ti')));
+  tr.appendChild(td(makeSpan(          'mult_'  + id, '2,000',      'cv')));
+  tr.appendChild(td(makeInput('number', 'cost_'  + id, '0',          'ti')));
+  tr.appendChild(td(makeInput('number', 'price_' + id, '0',          'ti')));
+  tr.appendChild(td(makeSpan(          'pnl_'   + id, '—',          'cv')));
+  tr.appendChild(td(makeSpan(          'pos_'   + id, '—',          'cv')));
+  tr.appendChild(td(makeSpan(          'rat_'   + id, '—',          'cv')));
+  tr.appendChild(td(delBtn));
 
-    ['n','q','c','p'].forEach(function(k){
-      var el=g(k+id);
-      if(el) el.addEventListener('input', calc);
-    });
+  tbody.appendChild(tr);
+  document.getElementById('name_' + id).focus();
+  recalcAll();
+}
 
-    g('n'+id).focus();
-    calc();
-  }
+document.getElementById('eqInp').addEventListener('input', recalcAll);
+document.getElementById('mgInp').addEventListener('input', recalcAll);
+document.getElementById('addBtn').addEventListener('click', addRow);
 
-  g('eq').addEventListener('input', calc);
-  g('mg').addEventListener('input', calc);
-  g('addBtn').addEventListener('click', addRow);
-  addRow();
-  addRow();
-})();
+addRow();
+addRow();
 </script>
 </body>
 </html>
