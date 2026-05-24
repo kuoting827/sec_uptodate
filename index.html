@@ -19,6 +19,27 @@ button{padding:8px 12px;background:#333;color:#fff;border:none;border-radius:6px
 .profit{color:#ff4d4f;font-weight:bold}
 .loss{color:#52c41a;font-weight:bold}
 .actions{margin:12px 0}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{min-width:720px !important;table-layout:fixed !important}
+th:nth-child(1),td:nth-child(1){width:90px}
+th:nth-child(2),td:nth-child(2){width:55px}
+th:nth-child(3),td:nth-child(3){width:75px}
+th:nth-child(4),td:nth-child(4){width:75px}
+th:nth-child(5),td:nth-child(5){width:60px}
+th:nth-child(6),td:nth-child(6){width:110px}
+th:nth-child(7),td:nth-child(7){width:110px}
+th:nth-child(8),td:nth-child(8){width:70px}
+
+.mult,.pnl,.pos,.ratio{white-space:nowrap}
+
+@media (max-width:768px){
+  body{margin:10px}
+  th,td{padding:4px;font-size:12px}
+  input{padding:4px;font-size:12px}
+  h1{font-size:22px}
+}
+
 </style>
 </head>
 <body>
