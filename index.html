@@ -1,333 +1,210 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>期貨部位追蹤表</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f7f7f5;--sur:#fff;--sur2:#f1f0ed;
-  --bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.18);
-  --tx:#1a1a18;--tx2:#6b6b67;--tx3:#a0a09c;
-  --gn:#2d7d46;--rd:#c0392b;--rdbg:#fdecea;--or:#c47b00;--blbg:#e8f1fb
-}
-@media(prefers-color-scheme:dark){:root{
-  --bg:#141412;--sur:#1e1e1b;--sur2:#272724;
-  --bd:rgba(255,255,255,.1);--bd2:rgba(255,255,255,.18);
-  --tx:#f0f0ec;--tx2:#9a9a94;--tx3:#5a5a56;
-  --gn:#4caf70;--rd:#e05a4a;--rdbg:#2b100d;--or:#e0a030;--blbg:#0d1e33
-}}
-body{font-family:'Helvetica Neue','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:2rem 1rem}
-.wrap{max-width:1000px;margin:0 auto}
-h1{font-size:22px;font-weight:600;letter-spacing:-.3px;margin-bottom:4px}
-.sub{font-size:13px;color:var(--tx2);margin-bottom:1.75rem}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-@media(max-width:500px){.g3{grid-template-columns:1fr 1fr}.g3>div:last-child{grid-column:1/-1}}
-.mc{background:var(--sur);border:.5px solid var(--bd);border-radius:10px;padding:14px 16px}
-.mc-lbl{font-size:11px;font-weight:500;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
-.mc-rel{position:relative;min-height:34px}
-.mc-show{font-size:22px;font-weight:600;color:var(--tx);line-height:1.35;pointer-events:none;user-select:none;min-height:34px}
-.mc-show.dim{color:var(--tx3);font-weight:400}
-.mc-hide{position:absolute;inset:0;width:100%;font-size:22px;font-weight:600;color:transparent;caret-color:var(--tx);background:transparent;border:none;outline:none;font-family:inherit}
-.mc-out{font-size:22px;font-weight:600;color:var(--tx);line-height:1.35;min-height:34px}
-.neg .mc-out{color:var(--rd)}
-.card{background:var(--sur);border:.5px solid var(--bd);border-radius:14px;overflow:hidden}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px;table-layout:fixed}
-.cn{width:115px}.cq{width:58px}.cm{width:72px}.cc{width:85px}.cp{width:85px}.cu{width:110px}.cs{width:110px}.cr{width:78px}.cd{width:40px}
-thead th{background:var(--sur2);font-size:11px;font-weight:500;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;padding:10px;text-align:left;border-bottom:.5px solid var(--bd);white-space:nowrap}
-tbody tr{border-bottom:.5px solid var(--bd)}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--sur2)}
-td{padding:6px 10px;vertical-align:middle}
-.ti{width:100%;background:transparent;border:none;outline:none;font-size:13px;color:var(--tx);font-family:inherit}
-.ti:focus{background:var(--blbg);border-radius:5px;padding:2px 5px;margin:-2px -5px}
-.cv{font-size:13px;color:var(--tx2)}
-.gn{color:var(--gn);font-weight:500}.rd{color:var(--rd);font-weight:500}.or{color:var(--or);font-weight:500}
-tfoot td{background:var(--sur2);border-top:.5px solid var(--bd2);padding:9px 10px;font-size:13px;font-weight:600;color:var(--tx)}
-.xbtn{background:none;border:none;cursor:pointer;color:var(--tx3);width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin:auto;font-size:14px;transition:background .15s,color .15s}
-.xbtn:hover{background:var(--rdbg);color:var(--rd)}
-.bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:.5px solid var(--bd);flex-wrap:wrap;gap:8px}
-.addbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;font-family:inherit;color:var(--tx);background:var(--sur2);border:.5px solid var(--bd2);border-radius:8px;padding:6px 14px;cursor:pointer}
-.hint{font-size:12px;color:var(--tx3)}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <h1>期貨部位追蹤表</h1>
-  <p class="sub">即時計算未實現損益、現貨部位與部位佔比</p>
 
-  <div class="g3">
-    <div class="mc">
-      <span class="mc-lbl">權益數</span>
-      <div class="mc-rel">
-        <div class="mc-show dim" id="eqShow">0</div>
-        <input class="mc-hide" type="number" id="eqInp" placeholder="0">
-      </div>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.wrap { padding: 1.5rem 0; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; }
+.metric label { font-size: 12px; color: var(--color-text-secondary); display: block; margin-bottom: 4px; }
+.metric input { font-size: 20px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: none; outline: none; width: 100%; }
+.metric .derived { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.metric.danger .derived { color: var(--color-text-danger); }
+.table-wrap { overflow-x: auto; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; table-layout: fixed; }
+thead th { background: var(--color-background-secondary); font-weight: 500; font-size: 12px; color: var(--color-text-secondary); padding: 10px 10px; text-align: left; border-bottom: 0.5px solid var(--color-border-tertiary); position: sticky; top: 0; z-index: 1; }
+thead th:nth-child(1) { width: 100px; }
+thead th:nth-child(2) { width: 60px; }
+thead th:nth-child(3) { width: 80px; }
+thead th:nth-child(4) { width: 80px; }
+thead th:nth-child(5) { width: 80px; }
+thead th:nth-child(6) { width: 110px; }
+thead th:nth-child(7) { width: 80px; }
+thead th:nth-child(8) { width: 40px; }
+tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--color-background-secondary); }
+tbody td { padding: 7px 10px; vertical-align: middle; }
+tbody td input { width: 100%; background: transparent; border: none; outline: none; font-size: 13px; color: var(--color-text-primary); font-family: var(--font-sans); }
+tbody td input:focus { background: var(--color-background-info); border-radius: 4px; padding: 2px 4px; margin: -2px -4px; }
+.calc { color: var(--color-text-secondary); font-size: 13px; }
+.ratio { font-weight: 500; }
+.ratio.high { color: var(--color-text-danger); }
+.ratio.med { color: var(--color-text-warning); }
+.ratio.ok { color: var(--color-text-success); }
+.add-row { display: flex; align-items: center; gap: 8px; margin-top: 1rem; }
+.add-row button { font-size: 13px; padding: 6px 14px; cursor: pointer; }
+.del-btn { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); font-size: 16px; padding: 2px 4px; border-radius: 4px; }
+.del-btn:hover { color: var(--color-text-danger); background: var(--color-background-danger); }
+.footer-total td { font-weight: 500; font-size: 13px; background: var(--color-background-secondary); padding: 8px 10px; border-top: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: var(--color-background-info); color: var(--color-text-info); margin-left: 4px; font-weight: 500; }
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only" style="position:absolute;left:-9999px">期貨部位追蹤表</h2>
+
+  <div class="summary-grid">
+    <div class="metric">
+      <label>權益數</label>
+      <input type="number" id="equity" placeholder="0" oninput="recalc()" />
     </div>
-    <div class="mc">
-      <span class="mc-lbl">原始保證金</span>
-      <div class="mc-rel">
-        <div class="mc-show dim" id="mgShow">0</div>
-        <input class="mc-hide" type="number" id="mgInp" placeholder="0">
-      </div>
+    <div class="metric">
+      <label>原始保證金</label>
+      <input type="number" id="margin" placeholder="0" oninput="recalc()" />
     </div>
-    <div class="mc" id="dropCard">
-      <span class="mc-lbl">可跌部位</span>
-      <div class="mc-out" id="dropOut">—</div>
+    <div class="metric" id="drop-metric">
+      <label>可跌部位</label>
+      <div class="derived" id="drop-display">—</div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="scroll">
-      <table>
-        <colgroup>
-          <col class="cn"><col class="cq"><col class="cm">
-          <col class="cc"><col class="cp"><col class="cu">
-          <col class="cs"><col class="cr"><col class="cd">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>標的名稱</th><th>口數</th><th>一口點數</th>
-            <th>成本價</th><th>現價</th><th>未實現損益</th>
-            <th>現貨部位</th><th>部位佔比</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-        <tfoot>
-          <tr>
-            <td colspan="5" style="color:var(--tx2);font-weight:500">合計</td>
-            <td id="fPnl">—</td>
-            <td id="fPos">—</td>
-            <td id="fRat">—</td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-    <div class="bar">
-      <button class="addbtn" id="addBtn">＋ 新增標的</button>
-      <span class="hint">微台×10 · 小台×50 · 台指×200 · 小型×100 · 其他×2000</span>
-    </div>
+  <div class="table-wrap">
+    <table id="pos-table">
+      <thead>
+        <tr>
+          <th>標的名稱</th>
+          <th>口數</th>
+          <th>一口點數</th>
+          <th>成本價</th>
+          <th>現價</th>
+          <th>現貨部位</th>
+          <th>部位佔比</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="pos-body"></tbody>
+      <tfoot>
+        <tr class="footer-total">
+          <td colspan="5" style="color:var(--color-text-secondary)">合計</td>
+          <td id="total-pos">—</td>
+          <td id="total-ratio">—</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="add-row">
+    <button onclick="addRow()"><i class="ti ti-plus" aria-hidden="true"></i> 新增標的</button>
   </div>
 </div>
 
 <script>
-var rowIds = [];
-var uid = 0;
+let rows = [];
+let rowId = 0;
 
 function getMultiplier(name) {
-  var n = name ? name.trim() : '';
-  var prefix = n.slice(0, 2);
-  if (prefix === '微台') return 10;
-  if (prefix === '小台') return 50;
-  if (prefix === '台指') return 200;
-  if (prefix === '小型') return 100;
+  const n = (name || '').trim();
+  if (n.startsWith('微台')) return 10;
+  if (n.startsWith('小台')) return 50;
+  if (n.startsWith('台指')) return 200;
+  if (n.startsWith('小型')) return 100;
   return 2000;
 }
 
-function formatNum(n) {
-  if (typeof n !== 'number' || isNaN(n)) return '—';
+function fmt(n) {
+  if (isNaN(n) || n === null) return '—';
   return Math.round(n).toLocaleString('zh-TW');
 }
 
-function updateSummaryDisplay(inpId, showId) {
-  var inp = document.getElementById(inpId);
-  var show = document.getElementById(showId);
-  if (!inp || !show) return;
-  var raw = inp.value.trim();
-  var v = parseFloat(raw);
-  if (raw === '' || isNaN(v)) {
-    show.textContent = '0';
-    show.className = 'mc-show dim';
-  } else {
-    show.textContent = Math.round(v).toLocaleString('zh-TW');
-    show.className = 'mc-show';
-  }
+function addRow() {
+  const id = ++rowId;
+  rows.push({ id });
+  renderRows();
+  const nameInput = document.getElementById('name-' + id);
+  if (nameInput) nameInput.focus();
 }
 
-function recalcAll() {
-  updateSummaryDisplay('eqInp', 'eqShow');
-  updateSummaryDisplay('mgInp', 'mgShow');
+function removeRow(id) {
+  rows = rows.filter(r => r.id !== id);
+  renderRows();
+  recalc();
+}
 
-  var eqRaw = document.getElementById('eqInp').value.trim();
-  var mgRaw = document.getElementById('mgInp').value.trim();
-  var equity = eqRaw !== '' ? parseFloat(eqRaw) : NaN;
-  var margin = mgRaw !== '' ? parseFloat(mgRaw) : NaN;
+function renderRows() {
+  const body = document.getElementById('pos-body');
+  body.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.id = 'row-' + r.id;
+    tr.innerHTML = `
+      <td><input type="text" id="name-${r.id}" placeholder="e.g. 小台202506" oninput="updateRow(${r.id})" /></td>
+      <td><input type="number" id="qty-${r.id}" placeholder="0" oninput="updateRow(${r.id})" /></td>
+      <td><span class="calc" id="mult-${r.id}">—</span></td>
+      <td><input type="number" id="cost-${r.id}" placeholder="0" oninput="updateRow(${r.id})" /></td>
+      <td><input type="number" id="price-${r.id}" placeholder="0" oninput="updateRow(${r.id})" /></td>
+      <td><span class="calc" id="pos-${r.id}">—</span></td>
+      <td><span class="calc ratio" id="ratio-${r.id}">—</span></td>
+      <td><button class="del-btn" onclick="removeRow(${r.id})" title="刪除"><i class="ti ti-x" aria-hidden="true"></i></button></td>
+    `;
+    body.appendChild(tr);
+  });
+  recalc();
+}
 
-  var dropOut = document.getElementById('dropOut');
-  var dropCard = document.getElementById('dropCard');
-  if (!isNaN(equity) || !isNaN(margin)) {
-    var eq = isNaN(equity) ? 0 : equity;
-    var mg = isNaN(margin) ? 0 : margin;
-    var drop = eq - mg;
-    dropOut.textContent = formatNum(drop);
-    if (drop < 0) dropCard.classList.add('neg');
-    else dropCard.classList.remove('neg');
-  } else {
-    dropOut.textContent = '—';
-    dropCard.classList.remove('neg');
-  }
+function updateRow(id) { recalc(); }
 
-  var totalPnl = 0, totalPos = 0, hasPnl = false, hasPos = false;
-  var eq2 = isNaN(equity) ? 0 : equity;
+function recalc() {
+  const equity = parseFloat(document.getElementById('equity').value) || 0;
+  const margin = parseFloat(document.getElementById('margin').value) || 0;
+  const drop = equity - margin;
 
-  for (var i = 0; i < rowIds.length; i++) {
-    var id = rowIds[i];
+  const dropEl = document.getElementById('drop-display');
+  const dropMetric = document.getElementById('drop-metric');
+  dropEl.textContent = isNaN(drop) ? '—' : fmt(drop);
+  dropMetric.classList.toggle('danger', drop < 0);
 
-    var nameInp  = document.getElementById('name_' + id);
-    var qtyInp   = document.getElementById('qty_' + id);
-    var costInp  = document.getElementById('cost_' + id);
-    var priceInp = document.getElementById('price_' + id);
-    var multSpan = document.getElementById('mult_' + id);
-    var pnlSpan  = document.getElementById('pnl_' + id);
-    var posSpan  = document.getElementById('pos_' + id);
-    var ratSpan  = document.getElementById('rat_' + id);
+  let totalPos = 0;
+  let allValid = false;
 
-    if (!nameInp) continue;
+  rows.forEach(r => {
+    const name = (document.getElementById('name-' + r.id) || {}).value || '';
+    const qty = parseFloat((document.getElementById('qty-' + r.id) || {}).value) || 0;
+    const price = parseFloat((document.getElementById('price-' + r.id) || {}).value);
+    const mult = getMultiplier(name);
 
-    var name  = nameInp.value;
-    var mult  = getMultiplier(name);
-    var qtyV  = qtyInp.value.trim();
-    var costV = costInp.value.trim();
-    var prcV  = priceInp.value.trim();
-    var qty   = qtyV   !== '' ? parseFloat(qtyV)  : NaN;
-    var cost  = costV  !== '' ? parseFloat(costV) : NaN;
-    var price = prcV   !== '' ? parseFloat(prcV)  : NaN;
+    const multEl = document.getElementById('mult-' + r.id);
+    const posEl = document.getElementById('pos-' + r.id);
+    const ratioEl = document.getElementById('ratio-' + r.id);
 
-    multSpan.textContent = mult.toLocaleString('zh-TW');
+    if (multEl) multEl.textContent = mult.toLocaleString('zh-TW');
 
-    var okQ = !isNaN(qty) && qty !== 0;
-    var okP = !isNaN(price);
-    var okC = !isNaN(cost);
-
-    if (okQ && okP && okC) {
-      var pnl = (price - cost) * qty * mult;
-      totalPnl += pnl;
-      hasPnl = true;
-      pnlSpan.textContent = formatNum(pnl);
-      pnlSpan.className = pnl > 0 ? 'cv gn' : pnl < 0 ? 'cv rd' : 'cv';
-    } else {
-      pnlSpan.textContent = '—';
-      pnlSpan.className = 'cv';
-    }
-
-    if (okQ && okP) {
-      var pos = qty * mult * price;
+    if (!isNaN(price) && qty !== 0) {
+      const pos = qty * mult * price;
       totalPos += pos;
-      hasPos = true;
-      posSpan.textContent = formatNum(pos);
-      if (eq2 > 0) {
-        var rat = (pos / eq2) * 100;
-        ratSpan.textContent = rat.toFixed(1) + '%';
-        ratSpan.className = rat > 60 ? 'cv rd' : rat > 30 ? 'cv or' : 'cv gn';
-      } else {
-        ratSpan.textContent = '—';
-        ratSpan.className = 'cv';
+      allValid = true;
+      if (posEl) posEl.textContent = fmt(pos);
+
+      if (equity > 0 && ratioEl) {
+        const ratio = (pos / equity) * 100;
+        ratioEl.textContent = ratio.toFixed(1) + '%';
+        ratioEl.className = 'calc ratio ' + (ratio > 60 ? 'high' : ratio > 30 ? 'med' : 'ok');
+      } else if (ratioEl) {
+        ratioEl.textContent = '—';
+        ratioEl.className = 'calc ratio';
       }
     } else {
-      posSpan.textContent = '—';
-      ratSpan.textContent = '—';
-      ratSpan.className = 'cv';
+      if (posEl) posEl.textContent = '—';
+      if (ratioEl) { ratioEl.textContent = '—'; ratioEl.className = 'calc ratio'; }
     }
-  }
-
-  var fPnl = document.getElementById('fPnl');
-  var fPos = document.getElementById('fPos');
-  var fRat = document.getElementById('fRat');
-
-  if (hasPnl) {
-    fPnl.textContent = formatNum(totalPnl);
-    fPnl.style.color = totalPnl > 0 ? 'var(--gn)' : totalPnl < 0 ? 'var(--rd)' : '';
-  } else {
-    fPnl.textContent = '—';
-    fPnl.style.color = '';
-  }
-
-  if (hasPos) {
-    fPos.textContent = formatNum(totalPos);
-    if (eq2 > 0) {
-      var totRat = (totalPos / eq2) * 100;
-      fRat.textContent = totRat.toFixed(1) + '%';
-      fRat.style.color = totRat > 60 ? 'var(--rd)' : totRat > 30 ? 'var(--or)' : 'var(--gn)';
-    } else {
-      fRat.textContent = '—';
-      fRat.style.color = '';
-    }
-  } else {
-    fPos.textContent = '—';
-    fRat.textContent = '—';
-    fRat.style.color = '';
-  }
-}
-
-function makeInput(type, id, placeholder, cls) {
-  var inp = document.createElement('input');
-  inp.type = type;
-  inp.id = id;
-  inp.placeholder = placeholder;
-  inp.className = cls;
-  inp.addEventListener('input', recalcAll);
-  return inp;
-}
-
-function makeSpan(id, text, cls) {
-  var s = document.createElement('span');
-  s.id = id;
-  s.textContent = text;
-  s.className = cls;
-  return s;
-}
-
-function addRow() {
-  uid++;
-  var id = uid;
-  rowIds.push(id);
-
-  var tbody = document.getElementById('tbody');
-  var tr = document.createElement('tr');
-  tr.id = 'row_' + id;
-
-  function td(child) {
-    var cell = document.createElement('td');
-    if (child) cell.appendChild(child);
-    return cell;
-  }
-
-  var delBtn = document.createElement('button');
-  delBtn.className = 'xbtn';
-  delBtn.textContent = '✕';
-  delBtn.setAttribute('data-id', id);
-  delBtn.addEventListener('click', function() {
-    var rid = parseInt(this.getAttribute('data-id'), 10);
-    rowIds = rowIds.filter(function(x) { return x !== rid; });
-    var row = document.getElementById('row_' + rid);
-    if (row) row.parentNode.removeChild(row);
-    recalcAll();
   });
 
-  tr.appendChild(td(makeInput('text',   'name_'  + id, '小台202506', 'ti')));
-  tr.appendChild(td(makeInput('number', 'qty_'   + id, '1',          'ti')));
-  tr.appendChild(td(makeSpan(          'mult_'  + id, '2,000',      'cv')));
-  tr.appendChild(td(makeInput('number', 'cost_'  + id, '0',          'ti')));
-  tr.appendChild(td(makeInput('number', 'price_' + id, '0',          'ti')));
-  tr.appendChild(td(makeSpan(          'pnl_'   + id, '—',          'cv')));
-  tr.appendChild(td(makeSpan(          'pos_'   + id, '—',          'cv')));
-  tr.appendChild(td(makeSpan(          'rat_'   + id, '—',          'cv')));
-  tr.appendChild(td(delBtn));
-
-  tbody.appendChild(tr);
-  document.getElementById('name_' + id).focus();
-  recalcAll();
+  const totalPosEl = document.getElementById('total-pos');
+  const totalRatioEl = document.getElementById('total-ratio');
+  if (allValid) {
+    totalPosEl.textContent = fmt(totalPos);
+    if (equity > 0) {
+      const totalRatio = (totalPos / equity) * 100;
+      totalRatioEl.textContent = totalRatio.toFixed(1) + '%';
+      totalRatioEl.style.color = totalRatio > 60 ? 'var(--color-text-danger)' : totalRatio > 30 ? 'var(--color-text-warning)' : 'var(--color-text-success)';
+    } else {
+      totalRatioEl.textContent = '—';
+    }
+  } else {
+    totalPosEl.textContent = '—';
+    totalRatioEl.textContent = '—';
+  }
 }
-
-document.getElementById('eqInp').addEventListener('input', recalcAll);
-document.getElementById('mgInp').addEventListener('input', recalcAll);
-document.getElementById('addBtn').addEventListener('click', addRow);
 
 addRow();
 addRow();
 </script>
-</body>
-</html>
