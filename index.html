@@ -1,69 +1,74 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>期貨部位追蹤表 Pro</title>
+<title>Futures Tracker Pro V4.1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body{background:#111;color:#eee;font-family:Arial,sans-serif;margin:20px}
-.card{background:#1b1b1b;border-radius:10px;padding:12px;margin-bottom:15px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-input{width:100%;background:#222;color:#fff;border:1px solid #333;padding:8px;border-radius:6px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:8px;border-bottom:1px solid #333;text-align:left}
-th{background:#1b1b1b}
-button{background:#333;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+body{background:#111;color:#eee;font-family:Arial,sans-serif;margin:16px}
+h1{margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card,.chartbox{background:#1b1b1b;border-radius:10px;padding:12px}
+input{width:100%;padding:8px;background:#222;color:#fff;border:1px solid #333;border-radius:6px}
+.table-wrap{overflow:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;background:#1b1b1b;min-width:950px}
+th,td{padding:8px;border-bottom:1px solid #333;text-align:center}
+th{background:#222;position:sticky;top:0}
+button{padding:8px 12px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer}
 .profit{color:#ff4d4f;font-weight:bold}
 .loss{color:#52c41a;font-weight:bold}
-.warn{color:#ff7875}
+.actions{margin:12px 0}
 </style>
 </head>
 <body>
-<h2>期貨部位追蹤表 Pro</h2>
+<h1>期貨部位追蹤表 V4.1 穩定版</h1>
 
-<div class="grid">
-<div class="card"><div>權益數</div><input id="equity" type="number"></div>
-<div class="card"><div>原始保證金</div><input id="margin" type="number"></div>
-<div class="card"><div>可跌部位</div><div id="drop">0</div></div>
+<div class="cards">
+<div class="card"><div>權益數</div><input id="equity"></div>
+<div class="card"><div>原始保證金</div><input id="margin"></div>
+<div class="card"><div>可跌部位</div><h2 id="drop">0</h2></div>
 </div>
 
-<div class="card">
+<div class="actions">
+<button onclick="addRow()">新增標的</button>
+<button onclick="exportData()">匯出</button>
+<input type="file" onchange="importData(event)">
+</div>
+
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>標的名稱</th>
-<th>口數</th>
-<th>成本價</th>
-<th>現價</th>
-<th>一口點數</th>
-<th>未實現損益</th>
-<th>現貨部位</th>
-<th>部位佔比</th>
-<th></th>
+<th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th>
+<th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>部位佔比</th><th></th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
 <tfoot>
 <tr>
-<td colspan="5">合計</td>
-<td id="totalPnl">0</td>
-<td id="totalPos">0</td>
-<td id="totalRatio">0%</td>
+<td colspan="5"><b>合計</b></td>
+<td id="totalPnlCell">0</td>
+<td id="totalPosCell">0</td>
+<td id="totalRatioCell">0%</td>
 <td></td>
 </tr>
 </tfoot>
 </table>
-<br>
-<button onclick="addRow()">新增標的</button>
-<button onclick="exportData()">匯出</button>
-<input type="file" id="importFile" onchange="importData(event)">
+</div>
+
+<div class="chartbox">
+<h3>部位佔比圓餅圖</h3>
+<canvas id="pieChart"></canvas>
 </div>
 
 <script>
-let rows=[];
-let uid=0;
+let chart=null;
 
-function getMultiplier(name){
+function parseNum(v){return Number(String(v).replace(/,/g,''))||0;}
+function fmt(v){return Math.round(v).toLocaleString('zh-TW');}
+
+function multiplier(name){
  if(name.startsWith('微台')) return 10;
  if(name.startsWith('小台')) return 50;
  if(name.startsWith('台指')) return 200;
@@ -71,120 +76,134 @@ function getMultiplier(name){
  return 2000;
 }
 
-function save(){
- localStorage.setItem('futuresTrackerPro',JSON.stringify({
- equity:document.getElementById('equity').value,
- margin:document.getElementById('margin').value,
- rows:rows
- }));
-}
-
-function load(){
- let d=localStorage.getItem('futuresTrackerPro');
- if(!d) return;
- d=JSON.parse(d);
- document.getElementById('equity').value=d.equity||'';
- document.getElementById('margin').value=d.margin||'';
- rows=d.rows||[];
- uid=Math.max(0,...rows.map(r=>r.id));
- rows.forEach(r=>renderRow(r.id,r));
- recalc();
+function formatMoneyInput(el){
+ const n=parseNum(el.value);
+ if(el.value!=="") el.value=n.toLocaleString('zh-TW');
 }
 
 function addRow(data={}){
- const id=++uid;
- rows.push({id});
- renderRow(id,data);
- save();
-}
-
-function renderRow(id,data={}){
  const tr=document.createElement('tr');
- tr.id='row'+id;
  tr.innerHTML=`
-<td><input value="${data.name||''}" oninput="recalc()"></td>
-<td><input type="number" value="${data.qty||1}" oninput="recalc()"></td>
-<td><input type="number" value="${data.cost||''}" oninput="recalc()"></td>
-<td><input type="number" value="${data.price||''}" oninput="recalc()"></td>
-<td class="mult">0</td>
-<td class="pnl">0</td>
-<td class="pos">0</td>
-<td class="ratio">0%</td>
-<td><button onclick="delRow(${id})">✕</button></td>`;
- document.getElementById('tbody').appendChild(tr);
-}
-
-function delRow(id){
- rows=rows.filter(x=>x.id!==id);
- document.getElementById('row'+id).remove();
+ <td><input class="name" value="${data.name||''}"></td>
+ <td><input class="qty" type="number" value="${data.qty||1}"></td>
+ <td><input class="cost" type="number" value="${data.cost||''}"></td>
+ <td><input class="price" type="number" value="${data.price||''}"></td>
+ <td class="mult">0</td>
+ <td class="pnl">0</td>
+ <td class="pos">0</td>
+ <td class="ratio">0%</td>
+ <td><button onclick="this.closest('tr').remove();recalc()">✕</button></td>`;
+ tr.querySelectorAll('input').forEach(i=>i.addEventListener('input',recalc));
+ tbody.appendChild(tr);
  recalc();
- save();
 }
 
 function recalc(){
- let eq=Number(equity.value)||0;
- let mg=Number(margin.value)||0;
- drop.textContent=(eq-mg).toLocaleString();
+ const equity=parseNum(equityEl.value);
+ const margin=parseNum(marginEl.value);
+
+ drop.textContent=fmt(equity-margin);
 
  let totalPnl=0,totalPos=0;
+ const labels=[],data=[];
 
  document.querySelectorAll('#tbody tr').forEach(tr=>{
-   let t=tr.querySelectorAll('input');
-   let name=t[0].value||'';
-   let qty=Number(t[1].value)||0;
-   let cost=Number(t[2].value)||0;
-   let price=Number(t[3].value)||0;
+   const name=tr.querySelector('.name').value||'未命名';
+   const qty=parseNum(tr.querySelector('.qty').value);
+   const cost=parseNum(tr.querySelector('.cost').value);
+   const price=parseNum(tr.querySelector('.price').value);
 
-   let mult=getMultiplier(name);
-   let pnl=(price-cost)*qty*mult;
-   let pos=qty*mult*price;
-   let ratio=eq?pos/eq*100:0;
+   const mult=multiplier(name);
+   const pnl=(price-cost)*qty*mult;
+   const pos=qty*mult*price;
+   const ratio=equity?pos/equity*100:0;
 
-   tr.querySelector('.mult').textContent=mult;
-   let pnlEl=tr.querySelector('.pnl');
-   pnlEl.textContent=Math.round(pnl).toLocaleString();
-   pnlEl.className='pnl '+(pnl>0?'profit':pnl<0?'loss':'');
+   tr.querySelector('.mult').textContent=fmt(mult);
 
-   tr.querySelector('.pos').textContent=Math.round(pos).toLocaleString();
+   const pnlCell=tr.querySelector('.pnl');
+   pnlCell.textContent=fmt(pnl);
+   pnlCell.className='pnl '+(pnl>0?'profit':pnl<0?'loss':'');
+
+   tr.querySelector('.pos').textContent=fmt(pos);
    tr.querySelector('.ratio').textContent=ratio.toFixed(1)+'%';
 
    totalPnl+=pnl;
    totalPos+=pos;
+
+   if(pos>0){labels.push(name+" ("+ratio.toFixed(1)+"%)");data.push(pos);}
  });
 
- totalPnlEl=document.getElementById('totalPnl');
- totalPnlEl.textContent=Math.round(totalPnl).toLocaleString();
- totalPnlEl.className=(totalPnl>0?'profit':totalPnl<0?'loss':'');
+ totalPnlCell.textContent=fmt(totalPnl);
+ totalPnlCell.className=(totalPnl>0?'profit':totalPnl<0?'loss':'');
 
- totalPosEl.textContent=Math.round(totalPos).toLocaleString();
- totalRatio.textContent=(eq?totalPos/eq*100:0).toFixed(1)+'%';
+ totalPosCell.textContent=fmt(totalPos);
+ totalRatioCell.textContent=(equity?totalPos/equity*100:0).toFixed(1)+'%';
 
- save();
+ localStorage.setItem('futuresV41',JSON.stringify(saveData()));
+ drawChart(labels,data);
 }
 
-equity.oninput=recalc;
-margin.oninput=recalc;
+function drawChart(labels,data){
+ const ctx=document.getElementById('pieChart');
+ if(chart) chart.destroy();
+ chart=new Chart(ctx,{
+   type:'pie',
+   data:{labels:labels,datasets:[{data:data}]},
+   options:{responsive:true,plugins:{legend:{labels:{color:'white'}}}}
+ });
+}
 
-window.onload=()=>{
- load();
- if(document.querySelectorAll('#tbody tr').length===0){addRow();addRow();}
-};
+function saveData(){
+ const rows=[];
+ document.querySelectorAll('#tbody tr').forEach(tr=>{
+   rows.push({
+     name:tr.querySelector('.name').value,
+     qty:tr.querySelector('.qty').value,
+     cost:tr.querySelector('.cost').value,
+     price:tr.querySelector('.price').value
+   });
+ });
+ return {equity:equityEl.value,margin:marginEl.value,rows};
+}
+
 function exportData(){
- const blob=new Blob([localStorage.getItem('futuresTrackerPro')||'{}'],{type:'application/json'});
+ const blob=new Blob([JSON.stringify(saveData(),null,2)],{type:'application/json'});
  const a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download='futures_tracker_backup.json';
+ a.download='futures_v41_backup.json';
  a.click();
 }
+
 function importData(e){
  const f=e.target.files[0];
  const r=new FileReader();
- r.onload=()=>{
-   localStorage.setItem('futuresTrackerPro',r.result);
-   location.reload();
- };
+ r.onload=()=>{localStorage.setItem('futuresV41',r.result);location.reload();};
  r.readAsText(f);
 }
+
+const equityEl=document.getElementById('equity');
+const marginEl=document.getElementById('margin');
+
+[equityEl,marginEl].forEach(el=>{
+ el.addEventListener('focus',()=>el.value=String(parseNum(el.value)||''));
+ el.addEventListener('blur',()=>{formatMoneyInput(el);recalc();});
+ el.addEventListener('input',recalc);
+});
+
+window.onload=()=>{
+ const saved=localStorage.getItem('futuresV41');
+ if(saved){
+   const d=JSON.parse(saved);
+   equityEl.value=d.equity||'';
+   marginEl.value=d.margin||'';
+   d.rows.forEach(r=>addRow(r));
+ }else{
+   addRow();addRow();
+ }
+ formatMoneyInput(equityEl);
+ formatMoneyInput(marginEl);
+ recalc();
+};
 </script>
 </body>
 </html>
