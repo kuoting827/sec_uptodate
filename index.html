@@ -1,210 +1,190 @@
-
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>期貨部位追蹤表 Pro</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); }
-.wrap { padding: 1.5rem 0; }
-.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
-.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.875rem 1rem; }
-.metric label { font-size: 12px; color: var(--color-text-secondary); display: block; margin-bottom: 4px; }
-.metric input { font-size: 20px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: none; outline: none; width: 100%; }
-.metric .derived { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
-.metric.danger .derived { color: var(--color-text-danger); }
-.table-wrap { overflow-x: auto; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; table-layout: fixed; }
-thead th { background: var(--color-background-secondary); font-weight: 500; font-size: 12px; color: var(--color-text-secondary); padding: 10px 10px; text-align: left; border-bottom: 0.5px solid var(--color-border-tertiary); position: sticky; top: 0; z-index: 1; }
-thead th:nth-child(1) { width: 100px; }
-thead th:nth-child(2) { width: 60px; }
-thead th:nth-child(3) { width: 80px; }
-thead th:nth-child(4) { width: 80px; }
-thead th:nth-child(5) { width: 80px; }
-thead th:nth-child(6) { width: 110px; }
-thead th:nth-child(7) { width: 80px; }
-thead th:nth-child(8) { width: 40px; }
-tbody tr { border-bottom: 0.5px solid var(--color-border-tertiary); }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--color-background-secondary); }
-tbody td { padding: 7px 10px; vertical-align: middle; }
-tbody td input { width: 100%; background: transparent; border: none; outline: none; font-size: 13px; color: var(--color-text-primary); font-family: var(--font-sans); }
-tbody td input:focus { background: var(--color-background-info); border-radius: 4px; padding: 2px 4px; margin: -2px -4px; }
-.calc { color: var(--color-text-secondary); font-size: 13px; }
-.ratio { font-weight: 500; }
-.ratio.high { color: var(--color-text-danger); }
-.ratio.med { color: var(--color-text-warning); }
-.ratio.ok { color: var(--color-text-success); }
-.add-row { display: flex; align-items: center; gap: 8px; margin-top: 1rem; }
-.add-row button { font-size: 13px; padding: 6px 14px; cursor: pointer; }
-.del-btn { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); font-size: 16px; padding: 2px 4px; border-radius: 4px; }
-.del-btn:hover { color: var(--color-text-danger); background: var(--color-background-danger); }
-.footer-total td { font-weight: 500; font-size: 13px; background: var(--color-background-secondary); padding: 8px 10px; border-top: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
-.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: var(--color-background-info); color: var(--color-text-info); margin-left: 4px; font-weight: 500; }
+body{background:#111;color:#eee;font-family:Arial,sans-serif;margin:20px}
+.card{background:#1b1b1b;border-radius:10px;padding:12px;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+input{width:100%;background:#222;color:#fff;border:1px solid #333;padding:8px;border-radius:6px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #333;text-align:left}
+th{background:#1b1b1b}
+button{background:#333;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+.profit{color:#ff4d4f;font-weight:bold}
+.loss{color:#52c41a;font-weight:bold}
+.warn{color:#ff7875}
 </style>
+</head>
+<body>
+<h2>期貨部位追蹤表 Pro</h2>
 
-<div class="wrap">
-  <h2 class="sr-only" style="position:absolute;left:-9999px">期貨部位追蹤表</h2>
+<div class="grid">
+<div class="card"><div>權益數</div><input id="equity" type="number"></div>
+<div class="card"><div>原始保證金</div><input id="margin" type="number"></div>
+<div class="card"><div>可跌部位</div><div id="drop">0</div></div>
+</div>
 
-  <div class="summary-grid">
-    <div class="metric">
-      <label>權益數</label>
-      <input type="number" id="equity" placeholder="0" oninput="recalc()" />
-    </div>
-    <div class="metric">
-      <label>原始保證金</label>
-      <input type="number" id="margin" placeholder="0" oninput="recalc()" />
-    </div>
-    <div class="metric" id="drop-metric">
-      <label>可跌部位</label>
-      <div class="derived" id="drop-display">—</div>
-    </div>
-  </div>
-
-  <div class="table-wrap">
-    <table id="pos-table">
-      <thead>
-        <tr>
-          <th>標的名稱</th>
-          <th>口數</th>
-          <th>一口點數</th>
-          <th>成本價</th>
-          <th>現價</th>
-          <th>現貨部位</th>
-          <th>部位佔比</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="pos-body"></tbody>
-      <tfoot>
-        <tr class="footer-total">
-          <td colspan="5" style="color:var(--color-text-secondary)">合計</td>
-          <td id="total-pos">—</td>
-          <td id="total-ratio">—</td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-
-  <div class="add-row">
-    <button onclick="addRow()"><i class="ti ti-plus" aria-hidden="true"></i> 新增標的</button>
-  </div>
+<div class="card">
+<table>
+<thead>
+<tr>
+<th>標的名稱</th>
+<th>口數</th>
+<th>成本價</th>
+<th>現價</th>
+<th>一口點數</th>
+<th>未實現損益</th>
+<th>現貨部位</th>
+<th>部位佔比</th>
+<th></th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+<tfoot>
+<tr>
+<td colspan="5">合計</td>
+<td id="totalPnl">0</td>
+<td id="totalPos">0</td>
+<td id="totalRatio">0%</td>
+<td></td>
+</tr>
+</tfoot>
+</table>
+<br>
+<button onclick="addRow()">新增標的</button>
+<button onclick="exportData()">匯出</button>
+<input type="file" id="importFile" onchange="importData(event)">
 </div>
 
 <script>
-let rows = [];
-let rowId = 0;
+let rows=[];
+let uid=0;
 
-function getMultiplier(name) {
-  const n = (name || '').trim();
-  if (n.startsWith('微台')) return 10;
-  if (n.startsWith('小台')) return 50;
-  if (n.startsWith('台指')) return 200;
-  if (n.startsWith('小型')) return 100;
-  return 2000;
+function getMultiplier(name){
+ if(name.startsWith('微台')) return 10;
+ if(name.startsWith('小台')) return 50;
+ if(name.startsWith('台指')) return 200;
+ if(name.startsWith('小型')) return 100;
+ return 2000;
 }
 
-function fmt(n) {
-  if (isNaN(n) || n === null) return '—';
-  return Math.round(n).toLocaleString('zh-TW');
+function save(){
+ localStorage.setItem('futuresTrackerPro',JSON.stringify({
+ equity:document.getElementById('equity').value,
+ margin:document.getElementById('margin').value,
+ rows:rows
+ }));
 }
 
-function addRow() {
-  const id = ++rowId;
-  rows.push({ id });
-  renderRows();
-  const nameInput = document.getElementById('name-' + id);
-  if (nameInput) nameInput.focus();
+function load(){
+ let d=localStorage.getItem('futuresTrackerPro');
+ if(!d) return;
+ d=JSON.parse(d);
+ document.getElementById('equity').value=d.equity||'';
+ document.getElementById('margin').value=d.margin||'';
+ rows=d.rows||[];
+ uid=Math.max(0,...rows.map(r=>r.id));
+ rows.forEach(r=>renderRow(r.id,r));
+ recalc();
 }
 
-function removeRow(id) {
-  rows = rows.filter(r => r.id !== id);
-  renderRows();
-  recalc();
+function addRow(data={}){
+ const id=++uid;
+ rows.push({id});
+ renderRow(id,data);
+ save();
 }
 
-function renderRows() {
-  const body = document.getElementById('pos-body');
-  body.innerHTML = '';
-  rows.forEach(r => {
-    const tr = document.createElement('tr');
-    tr.id = 'row-' + r.id;
-    tr.innerHTML = `
-      <td><input type="text" id="name-${r.id}" placeholder="e.g. 小台202506" oninput="updateRow(${r.id})" /></td>
-      <td><input type="number" id="qty-${r.id}" placeholder="0" oninput="updateRow(${r.id})" /></td>
-      <td><span class="calc" id="mult-${r.id}">—</span></td>
-      <td><input type="number" id="cost-${r.id}" placeholder="0" oninput="updateRow(${r.id})" /></td>
-      <td><input type="number" id="price-${r.id}" placeholder="0" oninput="updateRow(${r.id})" /></td>
-      <td><span class="calc" id="pos-${r.id}">—</span></td>
-      <td><span class="calc ratio" id="ratio-${r.id}">—</span></td>
-      <td><button class="del-btn" onclick="removeRow(${r.id})" title="刪除"><i class="ti ti-x" aria-hidden="true"></i></button></td>
-    `;
-    body.appendChild(tr);
-  });
-  recalc();
+function renderRow(id,data={}){
+ const tr=document.createElement('tr');
+ tr.id='row'+id;
+ tr.innerHTML=`
+<td><input value="${data.name||''}" oninput="recalc()"></td>
+<td><input type="number" value="${data.qty||1}" oninput="recalc()"></td>
+<td><input type="number" value="${data.cost||''}" oninput="recalc()"></td>
+<td><input type="number" value="${data.price||''}" oninput="recalc()"></td>
+<td class="mult">0</td>
+<td class="pnl">0</td>
+<td class="pos">0</td>
+<td class="ratio">0%</td>
+<td><button onclick="delRow(${id})">✕</button></td>`;
+ document.getElementById('tbody').appendChild(tr);
 }
 
-function updateRow(id) { recalc(); }
-
-function recalc() {
-  const equity = parseFloat(document.getElementById('equity').value) || 0;
-  const margin = parseFloat(document.getElementById('margin').value) || 0;
-  const drop = equity - margin;
-
-  const dropEl = document.getElementById('drop-display');
-  const dropMetric = document.getElementById('drop-metric');
-  dropEl.textContent = isNaN(drop) ? '—' : fmt(drop);
-  dropMetric.classList.toggle('danger', drop < 0);
-
-  let totalPos = 0;
-  let allValid = false;
-
-  rows.forEach(r => {
-    const name = (document.getElementById('name-' + r.id) || {}).value || '';
-    const qty = parseFloat((document.getElementById('qty-' + r.id) || {}).value) || 0;
-    const price = parseFloat((document.getElementById('price-' + r.id) || {}).value);
-    const mult = getMultiplier(name);
-
-    const multEl = document.getElementById('mult-' + r.id);
-    const posEl = document.getElementById('pos-' + r.id);
-    const ratioEl = document.getElementById('ratio-' + r.id);
-
-    if (multEl) multEl.textContent = mult.toLocaleString('zh-TW');
-
-    if (!isNaN(price) && qty !== 0) {
-      const pos = qty * mult * price;
-      totalPos += pos;
-      allValid = true;
-      if (posEl) posEl.textContent = fmt(pos);
-
-      if (equity > 0 && ratioEl) {
-        const ratio = (pos / equity) * 100;
-        ratioEl.textContent = ratio.toFixed(1) + '%';
-        ratioEl.className = 'calc ratio ' + (ratio > 60 ? 'high' : ratio > 30 ? 'med' : 'ok');
-      } else if (ratioEl) {
-        ratioEl.textContent = '—';
-        ratioEl.className = 'calc ratio';
-      }
-    } else {
-      if (posEl) posEl.textContent = '—';
-      if (ratioEl) { ratioEl.textContent = '—'; ratioEl.className = 'calc ratio'; }
-    }
-  });
-
-  const totalPosEl = document.getElementById('total-pos');
-  const totalRatioEl = document.getElementById('total-ratio');
-  if (allValid) {
-    totalPosEl.textContent = fmt(totalPos);
-    if (equity > 0) {
-      const totalRatio = (totalPos / equity) * 100;
-      totalRatioEl.textContent = totalRatio.toFixed(1) + '%';
-      totalRatioEl.style.color = totalRatio > 60 ? 'var(--color-text-danger)' : totalRatio > 30 ? 'var(--color-text-warning)' : 'var(--color-text-success)';
-    } else {
-      totalRatioEl.textContent = '—';
-    }
-  } else {
-    totalPosEl.textContent = '—';
-    totalRatioEl.textContent = '—';
-  }
+function delRow(id){
+ rows=rows.filter(x=>x.id!==id);
+ document.getElementById('row'+id).remove();
+ recalc();
+ save();
 }
 
-addRow();
-addRow();
+function recalc(){
+ let eq=Number(equity.value)||0;
+ let mg=Number(margin.value)||0;
+ drop.textContent=(eq-mg).toLocaleString();
+
+ let totalPnl=0,totalPos=0;
+
+ document.querySelectorAll('#tbody tr').forEach(tr=>{
+   let t=tr.querySelectorAll('input');
+   let name=t[0].value||'';
+   let qty=Number(t[1].value)||0;
+   let cost=Number(t[2].value)||0;
+   let price=Number(t[3].value)||0;
+
+   let mult=getMultiplier(name);
+   let pnl=(price-cost)*qty*mult;
+   let pos=qty*mult*price;
+   let ratio=eq?pos/eq*100:0;
+
+   tr.querySelector('.mult').textContent=mult;
+   let pnlEl=tr.querySelector('.pnl');
+   pnlEl.textContent=Math.round(pnl).toLocaleString();
+   pnlEl.className='pnl '+(pnl>0?'profit':pnl<0?'loss':'');
+
+   tr.querySelector('.pos').textContent=Math.round(pos).toLocaleString();
+   tr.querySelector('.ratio').textContent=ratio.toFixed(1)+'%';
+
+   totalPnl+=pnl;
+   totalPos+=pos;
+ });
+
+ totalPnlEl=document.getElementById('totalPnl');
+ totalPnlEl.textContent=Math.round(totalPnl).toLocaleString();
+ totalPnlEl.className=(totalPnl>0?'profit':totalPnl<0?'loss':'');
+
+ totalPosEl.textContent=Math.round(totalPos).toLocaleString();
+ totalRatio.textContent=(eq?totalPos/eq*100:0).toFixed(1)+'%';
+
+ save();
+}
+
+equity.oninput=recalc;
+margin.oninput=recalc;
+
+window.onload=()=>{
+ load();
+ if(document.querySelectorAll('#tbody tr').length===0){addRow();addRow();}
+};
+function exportData(){
+ const blob=new Blob([localStorage.getItem('futuresTrackerPro')||'{}'],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='futures_tracker_backup.json';
+ a.click();
+}
+function importData(e){
+ const f=e.target.files[0];
+ const r=new FileReader();
+ r.onload=()=>{
+   localStorage.setItem('futuresTrackerPro',r.result);
+   location.reload();
+ };
+ r.readAsText(f);
+}
 </script>
+</body>
+</html>
