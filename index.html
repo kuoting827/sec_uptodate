@@ -8,9 +8,9 @@
 <style>
 body{background:#111;color:#eee;font-family:Arial,sans-serif;margin:16px}
 h1{margin-bottom:16px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(110px,1fr));gap:8px}
 .card,.chartbox{background:#1b1b1b;border-radius:10px;padding:12px}
-input{width:100%;padding:8px;background:#222;color:#fff;border:1px solid #333;border-radius:6px}
+input{width:100%;padding:6px;background:#222;color:#fff;border:1px solid #333;border-radius:6px}
 .table-wrap{overflow:auto;margin-top:16px}
 table{width:100%;border-collapse:collapse;background:#1b1b1b;min-width:950px}
 th,td{padding:8px;border-bottom:1px solid #333;text-align:center}
@@ -23,7 +23,7 @@ button{padding:8px 12px;background:#333;color:#fff;border:none;border-radius:6px
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{min-width:720px !important;table-layout:fixed !important}
 th:nth-child(1),td:nth-child(1){width:90px}
-th:nth-child(2),td:nth-child(2){width:55px}
+th:nth-child(2),td:nth-child(2){width:28px}
 th:nth-child(3),td:nth-child(3){width:75px}
 th:nth-child(4),td:nth-child(4){width:75px}
 th:nth-child(5),td:nth-child(5){width:60px}
@@ -51,6 +51,18 @@ th:nth-child(8),td:nth-child(8){width:70px}
 <div class="card"><div>可跌部位</div><h2 id="drop">0</h2></div>
 </div>
 
+
+<div class="cards" style="margin-top:10px">
+<div class="card">
+<div>總現貨部位</div>
+<h2 id="summaryPos">0</h2>
+</div>
+<div class="card">
+<div>總槓桿倍數</div>
+<h2 id="summaryLev">0x</h2>
+</div>
+</div>
+
 <div class="actions">
 <button onclick="addRow()">新增標的</button>
 <button onclick="exportData()">匯出</button>
@@ -62,7 +74,7 @@ th:nth-child(8),td:nth-child(8){width:70px}
 <thead>
 <tr>
 <th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th>
-<th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>部位佔比</th><th></th>
+<th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>槓桿倍數</th><th></th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -71,7 +83,7 @@ th:nth-child(8),td:nth-child(8){width:70px}
 <td colspan="5"><b>合計</b></td>
 <td id="totalPnlCell">0</td>
 <td id="totalPosCell">0</td>
-<td id="totalRatioCell">0%</td>
+<td id="totalRatioCell">0x</td>
 <td></td>
 </tr>
 </tfoot>
@@ -146,19 +158,24 @@ function recalc(){
    pnlCell.className='pnl '+(pnl>0?'profit':pnl<0?'loss':'');
 
    tr.querySelector('.pos').textContent=fmt(pos);
-   tr.querySelector('.ratio').textContent=ratio.toFixed(1)+'%';
+   tr.querySelector('.ratio').textContent=ratio.toFixed(2)+'x';
 
    totalPnl+=pnl;
    totalPos+=pos;
 
-   if(pos>0){labels.push(name+" ("+ratio.toFixed(1)+"%)");data.push(pos);}
+   if(pos>0){labels.push(name+" ("+ratio.toFixed(2)+"x)");data.push(pos);}
  });
 
  totalPnlCell.textContent=fmt(totalPnl);
  totalPnlCell.className=(totalPnl>0?'profit':totalPnl<0?'loss':'');
 
  totalPosCell.textContent=fmt(totalPos);
- totalRatioCell.textContent=(equity?totalPos/equity*100:0).toFixed(1)+'%';
+ 
+const lev=(equity?totalPos/equity:0);
+totalRatioCell.textContent=lev.toFixed(2)+'x';
+document.getElementById('summaryPos').textContent=fmt(totalPos);
+document.getElementById('summaryLev').textContent=lev.toFixed(2)+'x';
+
 
  localStorage.setItem('futuresV41',JSON.stringify(saveData()));
  drawChart(labels,data);
