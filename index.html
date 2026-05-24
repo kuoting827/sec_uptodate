@@ -21,10 +21,8 @@
     --red: #c0392b;
     --red-bg: #fdecea;
     --orange: #c47b00;
-    --orange-bg: #fff4e0;
     --blue: #1a5fa8;
     --blue-bg: #e8f1fb;
-    --accent: #1a1a18;
     --radius: 10px;
     --radius-lg: 14px;
   }
@@ -44,7 +42,6 @@
       --red: #e05a4a;
       --red-bg: #2b100d;
       --orange: #e0a030;
-      --orange-bg: #2b1e05;
       --blue: #5a9de0;
       --blue-bg: #0d1e33;
     }
@@ -58,27 +55,11 @@
     padding: 2rem 1rem;
   }
 
-  .container {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
+  .container { max-width: 1000px; margin: 0 auto; }
 
-  header {
-    margin-bottom: 1.75rem;
-  }
-
-  header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
-    color: var(--text);
-  }
-
-  header p {
-    font-size: 13px;
-    color: var(--text2);
-    margin-top: 4px;
-  }
+  header { margin-bottom: 1.75rem; }
+  header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
 
   .summary-grid {
     display: grid;
@@ -109,10 +90,26 @@
     margin-bottom: 6px;
   }
 
-  .metric input {
+  .metric-input-wrap { position: relative; }
+
+  .metric-display {
     font-size: 22px;
     font-weight: 600;
     color: var(--text);
+    pointer-events: none;
+    min-height: 32px;
+    line-height: 1.2;
+  }
+
+  .metric-display.placeholder { color: var(--text3); font-weight: 400; }
+
+  .metric-real-input {
+    position: absolute;
+    inset: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: transparent;
+    caret-color: var(--text);
     background: transparent;
     border: none;
     outline: none;
@@ -120,12 +117,12 @@
     font-family: inherit;
   }
 
-  .metric input::placeholder { color: var(--text3); font-weight: 400; }
-
   .metric .derived {
     font-size: 22px;
     font-weight: 600;
     color: var(--text);
+    min-height: 32px;
+    line-height: 1.2;
   }
 
   .metric.neg .derived { color: var(--red); }
@@ -164,7 +161,7 @@
     color: var(--text2);
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    padding: 10px 10px;
+    padding: 10px;
     text-align: left;
     border-bottom: 0.5px solid var(--border);
     white-space: nowrap;
@@ -178,12 +175,9 @@
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--surface2); }
 
-  tbody td {
-    padding: 7px 10px;
-    vertical-align: middle;
-  }
+  tbody td { padding: 6px 10px; vertical-align: middle; }
 
-  tbody td input {
+  .td-input {
     width: 100%;
     background: transparent;
     border: none;
@@ -193,19 +187,19 @@
     font-family: inherit;
   }
 
-  tbody td input:focus {
+  .td-input:focus {
     background: var(--blue-bg);
     border-radius: 5px;
     padding: 2px 5px;
     margin: -2px -5px;
   }
 
-  .cv { font-size: 13px; color: var(--text2); }
+  .cv { font-size: 13px; color: var(--text2); display: block; }
   .pnl-p { color: var(--green); font-weight: 500; }
   .pnl-n { color: var(--red); font-weight: 500; }
-  .r-hi { color: var(--red); font-weight: 500; }
-  .r-md { color: var(--orange); font-weight: 500; }
-  .r-lo { color: var(--green); font-weight: 500; }
+  .r-hi  { color: var(--red); font-weight: 500; }
+  .r-md  { color: var(--orange); font-weight: 500; }
+  .r-lo  { color: var(--green); font-weight: 500; }
 
   tfoot td {
     background: var(--surface2);
@@ -221,14 +215,14 @@
     border: none;
     cursor: pointer;
     color: var(--text3);
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: auto;
-    font-size: 16px;
+    font-size: 14px;
     transition: background 0.15s, color 0.15s;
   }
 
@@ -241,6 +235,8 @@
     padding: 10px 12px;
     border-top: 0.5px solid var(--border);
     background: var(--surface);
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .btn {
@@ -261,22 +257,7 @@
 
   .btn:hover { background: var(--border); }
 
-  .hint {
-    font-size: 12px;
-    color: var(--text3);
-  }
-
-  .badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 1px 5px;
-    border-radius: 4px;
-    background: var(--blue-bg);
-    color: var(--blue);
-    margin-left: 4px;
-    vertical-align: middle;
-  }
+  .hint { font-size: 12px; color: var(--text3); }
 </style>
 </head>
 <body>
@@ -290,11 +271,17 @@
   <div class="summary-grid">
     <div class="metric">
       <label>權益數</label>
-      <input type="number" id="equity" placeholder="0" oninput="calc()">
+      <div class="metric-input-wrap">
+        <div class="metric-display placeholder" id="equity-display">0</div>
+        <input class="metric-real-input" type="number" id="equity" placeholder="0" autocomplete="off">
+      </div>
     </div>
     <div class="metric">
       <label>原始保證金</label>
-      <input type="number" id="margin" placeholder="0" oninput="calc()">
+      <div class="metric-input-wrap">
+        <div class="metric-display placeholder" id="margin-display">0</div>
+        <input class="metric-real-input" type="number" id="margin" placeholder="0" autocomplete="off">
+      </div>
     </div>
     <div class="metric" id="drop-card">
       <label>可跌部位</label>
@@ -336,7 +323,7 @@
       </table>
     </div>
     <div class="toolbar">
-      <button class="btn" onclick="addRow()">＋ 新增標的</button>
+      <button class="btn" id="add-btn">＋ 新增標的</button>
       <span class="hint">微台×10 &nbsp;·&nbsp; 小台×50 &nbsp;·&nbsp; 台指×200 &nbsp;·&nbsp; 小型×100 &nbsp;·&nbsp; 其他×2000</span>
     </div>
   </div>
@@ -344,134 +331,172 @@
 </div>
 
 <script>
-let rows = [], uid = 0;
+(function () {
+  'use strict';
 
-function getMultiplier(name) {
-  const n = (name || '').trim();
-  if (n.startsWith('微台')) return 10;
-  if (n.startsWith('小台')) return 50;
-  if (n.startsWith('台指')) return 200;
-  if (n.startsWith('小型')) return 100;
-  return 2000;
-}
+  let rows = [], uid = 0;
 
-function fmt(n) {
-  if (n === null || isNaN(n)) return '—';
-  return Math.round(n).toLocaleString('zh-TW');
-}
+  function getMultiplier(name) {
+    const n = (name || '').trim();
+    if (n.startsWith('微台')) return 10;
+    if (n.startsWith('小台')) return 50;
+    if (n.startsWith('台指')) return 200;
+    if (n.startsWith('小型')) return 100;
+    return 2000;
+  }
 
-function addRow() {
-  const id = ++uid;
-  rows.push({ id });
-  renderRows();
-  const el = document.getElementById('n' + id);
-  if (el) el.focus();
-}
+  function fmt(n) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Math.round(n).toLocaleString('zh-TW');
+  }
 
-function removeRow(id) {
-  rows = rows.filter(r => r.id !== id);
-  renderRows();
-}
+  function syncDisplay(inputId, displayId) {
+    const input = document.getElementById(inputId);
+    const display = document.getElementById(displayId);
+    if (!input || !display) return;
+    const v = parseFloat(input.value);
+    if (isNaN(v) || input.value === '') {
+      display.textContent = '0';
+      display.classList.add('placeholder');
+    } else {
+      display.textContent = Math.round(v).toLocaleString('zh-TW');
+      display.classList.remove('placeholder');
+    }
+  }
 
-function renderRows() {
-  const tb = document.getElementById('tbody');
-  tb.innerHTML = '';
-  rows.forEach(r => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="text" id="n${r.id}" placeholder="小台202506" oninput="calc()"></td>
-      <td><input type="number" id="q${r.id}" placeholder="1" oninput="calc()"></td>
-      <td><span class="cv" id="m${r.id}">—</span></td>
-      <td><input type="number" id="c${r.id}" placeholder="0" oninput="calc()"></td>
-      <td><input type="number" id="p${r.id}" placeholder="0" oninput="calc()"></td>
-      <td><span class="cv" id="u${r.id}">—</span></td>
-      <td><span class="cv" id="s${r.id}">—</span></td>
-      <td><span class="cv" id="t${r.id}">—</span></td>
-      <td><button class="del-btn" onclick="removeRow(${r.id})" title="刪除">✕</button></td>
-    `;
-    tb.appendChild(tr);
-  });
-  calc();
-}
+  function calc() {
+    syncDisplay('equity', 'equity-display');
+    syncDisplay('margin', 'margin-display');
 
-function calc() {
-  const equity = parseFloat(document.getElementById('equity').value) || 0;
-  const margin = parseFloat(document.getElementById('margin').value) || 0;
-  const drop = equity - margin;
-  const dv = document.getElementById('drop-val');
-  const dc = document.getElementById('drop-card');
-  dv.textContent = (equity || margin) ? fmt(drop) : '—';
-  dc.classList.toggle('neg', drop < 0 && (equity || margin));
+    const equity = parseFloat(document.getElementById('equity').value) || 0;
+    const margin = parseFloat(document.getElementById('margin').value) || 0;
+    const drop = equity - margin;
 
-  let totPnl = 0, totPos = 0, anyPnl = false, anyPos = false;
+    const dv = document.getElementById('drop-val');
+    const dc = document.getElementById('drop-card');
+    dv.textContent = (equity || margin) ? fmt(drop) : '—';
+    dc.classList.toggle('neg', drop < 0 && (equity || margin));
 
-  rows.forEach(r => {
-    const name = (document.getElementById('n' + r.id) || {}).value || '';
-    const qty  = parseFloat((document.getElementById('q' + r.id) || {}).value);
-    const cost = parseFloat((document.getElementById('c' + r.id) || {}).value);
-    const price= parseFloat((document.getElementById('p' + r.id) || {}).value);
-    const mp   = getMultiplier(name);
+    let totPnl = 0, totPos = 0, anyPnl = false, anyPos = false;
 
-    const mEl = document.getElementById('m' + r.id);
-    const uEl = document.getElementById('u' + r.id);
-    const sEl = document.getElementById('s' + r.id);
-    const tEl = document.getElementById('t' + r.id);
+    rows.forEach(function (r) {
+      var nameEl  = document.getElementById('n' + r.id);
+      var qtyEl   = document.getElementById('q' + r.id);
+      var costEl  = document.getElementById('c' + r.id);
+      var priceEl = document.getElementById('p' + r.id);
+      var mEl     = document.getElementById('m' + r.id);
+      var uEl     = document.getElementById('u' + r.id);
+      var sEl     = document.getElementById('s' + r.id);
+      var tEl     = document.getElementById('t' + r.id);
 
-    if (mEl) mEl.textContent = mp.toLocaleString('zh-TW');
+      if (!nameEl) return;
 
-    const hasQty   = !isNaN(qty) && qty !== 0;
-    const hasPrice = !isNaN(price);
-    const hasCost  = !isNaN(cost);
+      var name  = nameEl.value || '';
+      var qty   = parseFloat(qtyEl ? qtyEl.value : '');
+      var cost  = parseFloat(costEl ? costEl.value : '');
+      var price = parseFloat(priceEl ? priceEl.value : '');
+      var mp    = getMultiplier(name);
 
-    if (hasQty && hasPrice && hasCost) {
-      const pnl = (price - cost) * qty * mp;
-      totPnl += pnl;
-      anyPnl = true;
-      if (uEl) {
-        uEl.textContent = fmt(pnl);
-        uEl.className = 'cv ' + (pnl > 0 ? 'pnl-p' : pnl < 0 ? 'pnl-n' : '');
+      if (mEl) mEl.textContent = mp.toLocaleString('zh-TW');
+
+      var hasQty   = !isNaN(qty) && qty !== 0;
+      var hasPrice = !isNaN(price);
+      var hasCost  = !isNaN(cost);
+
+      if (hasQty && hasPrice && hasCost) {
+        var pnl = (price - cost) * qty * mp;
+        totPnl += pnl;
+        anyPnl = true;
+        if (uEl) {
+          uEl.textContent = fmt(pnl);
+          uEl.className = 'cv ' + (pnl > 0 ? 'pnl-p' : pnl < 0 ? 'pnl-n' : '');
+        }
+      } else {
+        if (uEl) { uEl.textContent = '—'; uEl.className = 'cv'; }
       }
-    } else {
-      if (uEl) { uEl.textContent = '—'; uEl.className = 'cv'; }
-    }
 
-    if (hasQty && hasPrice) {
-      const pos = qty * mp * price;
-      totPos += pos;
-      anyPos = true;
-      if (sEl) sEl.textContent = fmt(pos);
-      if (equity > 0 && tEl) {
-        const ratio = (pos / equity) * 100;
-        tEl.textContent = ratio.toFixed(1) + '%';
-        tEl.className = 'cv ' + (ratio > 60 ? 'r-hi' : ratio > 30 ? 'r-md' : 'r-lo');
-      } else if (tEl) { tEl.textContent = '—'; tEl.className = 'cv'; }
-    } else {
-      if (sEl) sEl.textContent = '—';
-      if (tEl) { tEl.textContent = '—'; tEl.className = 'cv'; }
-    }
+      if (hasQty && hasPrice) {
+        var pos = qty * mp * price;
+        totPos += pos;
+        anyPos = true;
+        if (sEl) sEl.textContent = fmt(pos);
+        if (equity > 0 && tEl) {
+          var ratio = (pos / equity) * 100;
+          tEl.textContent = ratio.toFixed(1) + '%';
+          tEl.className = 'cv ' + (ratio > 60 ? 'r-hi' : ratio > 30 ? 'r-md' : 'r-lo');
+        } else if (tEl) { tEl.textContent = '—'; tEl.className = 'cv'; }
+      } else {
+        if (sEl) sEl.textContent = '—';
+        if (tEl) { tEl.textContent = '—'; tEl.className = 'cv'; }
+      }
+    });
+
+    var fp = document.getElementById('foot-pnl');
+    var fs = document.getElementById('foot-pos');
+    var ft = document.getElementById('foot-rat');
+
+    if (anyPnl) {
+      fp.textContent = fmt(totPnl);
+      fp.style.color = totPnl > 0 ? 'var(--green)' : totPnl < 0 ? 'var(--red)' : 'var(--text)';
+    } else { fp.textContent = '—'; fp.style.color = ''; }
+
+    if (anyPos) {
+      fs.textContent = fmt(totPos);
+      if (equity > 0) {
+        var tr2 = (totPos / equity) * 100;
+        ft.textContent = tr2.toFixed(1) + '%';
+        ft.style.color = tr2 > 60 ? 'var(--red)' : tr2 > 30 ? 'var(--orange)' : 'var(--green)';
+      } else { ft.textContent = '—'; ft.style.color = ''; }
+    } else { fs.textContent = '—'; ft.textContent = '—'; ft.style.color = ''; }
+  }
+
+  function addRow() {
+    var id = ++uid;
+    rows.push({ id: id });
+
+    var tb = document.getElementById('tbody');
+    var tr = document.createElement('tr');
+    tr.id = 'row' + id;
+    tr.innerHTML =
+      '<td><input class="td-input" type="text" id="n' + id + '" placeholder="小台202506"></td>' +
+      '<td><input class="td-input" type="number" id="q' + id + '" placeholder="1"></td>' +
+      '<td><span class="cv" id="m' + id + '">—</span></td>' +
+      '<td><input class="td-input" type="number" id="c' + id + '" placeholder="0"></td>' +
+      '<td><input class="td-input" type="number" id="p' + id + '" placeholder="0"></td>' +
+      '<td><span class="cv" id="u' + id + '">—</span></td>' +
+      '<td><span class="cv" id="s' + id + '">—</span></td>' +
+      '<td><span class="cv" id="t' + id + '">—</span></td>' +
+      '<td><button class="del-btn" data-id="' + id + '" title="刪除">✕</button></td>';
+    tb.appendChild(tr);
+
+    ['n','q','c','p'].forEach(function(prefix) {
+      var el = document.getElementById(prefix + id);
+      if (el) el.addEventListener('input', calc);
+    });
+
+    var delBtn = tr.querySelector('.del-btn');
+    delBtn.addEventListener('click', function() {
+      var rid = parseInt(this.getAttribute('data-id'), 10);
+      rows = rows.filter(function(r) { return r.id !== rid; });
+      var rowEl = document.getElementById('row' + rid);
+      if (rowEl) rowEl.remove();
+      calc();
+    });
+
+    var firstInput = document.getElementById('n' + id);
+    if (firstInput) firstInput.focus();
+
+    calc();
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('equity').addEventListener('input', calc);
+    document.getElementById('margin').addEventListener('input', calc);
+    document.getElementById('add-btn').addEventListener('click', addRow);
+    addRow();
+    addRow();
   });
-
-  const fp = document.getElementById('foot-pnl');
-  const fs = document.getElementById('foot-pos');
-  const ft = document.getElementById('foot-rat');
-
-  if (anyPnl) {
-    fp.textContent = fmt(totPnl);
-    fp.style.color = totPnl > 0 ? 'var(--green)' : totPnl < 0 ? 'var(--red)' : 'var(--text)';
-  } else { fp.textContent = '—'; fp.style.color = ''; }
-
-  if (anyPos) {
-    fs.textContent = fmt(totPos);
-    if (equity > 0) {
-      const tr = (totPos / equity) * 100;
-      ft.textContent = tr.toFixed(1) + '%';
-      ft.style.color = tr > 60 ? 'var(--red)' : tr > 30 ? 'var(--orange)' : 'var(--green)';
-    } else { ft.textContent = '—'; ft.style.color = ''; }
-  } else { fs.textContent = '—'; ft.textContent = '—'; ft.style.color = ''; }
-}
-
-addRow();
-addRow();
+})();
 </script>
 </body>
 </html>
