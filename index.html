@@ -40,6 +40,14 @@ th:nth-child(8),td:nth-child(8){width:70px}
   h1{font-size:22px}
 }
 
+
+.card h2{
+  font-size:24px;
+  font-weight:bold;
+  margin-top:8px;
+  color:#fff;
+}
+
 </style>
 </head>
 <body>
@@ -149,7 +157,7 @@ function recalc(){
    const mult=multiplier(name);
    const pnl=(price-cost)*qty*mult;
    const pos=qty*mult*price;
-   const ratio=equity?pos/equity*100:0;
+   const ratio=equity?pos/equity:0;
 
    tr.querySelector('.mult').textContent=fmt(mult);
 
