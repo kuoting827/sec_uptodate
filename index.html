@@ -100,8 +100,7 @@ summary{cursor:pointer}
 <table>
 <thead>
 <tr>
-<th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th>
-<th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>槓桿倍數</th><th></th>
+<th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th><th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>槓桿倍數</th><th>排序</th><th>刪除</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -142,7 +141,7 @@ function formatMoneyInput(el){
 }
 
 function addRow(data={}){
- const tr=document.createElement('tr');
+ const tr=document.createElement('tr'); tr.draggable=true;
  tr.innerHTML=`
  <td><input class="name" value="${data.name||''}"></td>
  <td><input class="qty" type="number" value="${data.qty||1}"></td>
@@ -151,8 +150,7 @@ function addRow(data={}){
  <td class="mult">0</td>
  <td class="pnl">0</td>
  <td class="pos">0</td>
- <td class="ratio">0%</td>
- <td><button onclick="this.closest('tr').remove();recalc()">✕</button></td>`;
+ <td class="ratio">0%</td><td class="drag-handle" style="cursor:grab;font-size:18px">☰</td><td><button onclick="this.closest('tr').remove();recalc()">✕</button></td>`;
  tr.querySelectorAll('input').forEach(i=>i.addEventListener('input',recalc));
  tbody.appendChild(tr);
  recalc();
@@ -253,6 +251,31 @@ const marginEl=document.getElementById('margin');
  el.addEventListener('focus',()=>el.value=String(parseNum(el.value)||''));
  el.addEventListener('blur',()=>{formatMoneyInput(el);recalc();});
  el.addEventListener('input',recalc);
+});
+
+
+let draggedRow=null;
+document.addEventListener('dragstart',e=>{
+ const row=e.target.closest('tr');
+ if(row && row.parentElement && row.parentElement.id==='tbody'){
+   draggedRow=row;
+   row.style.opacity='0.5';
+ }
+});
+document.addEventListener('dragover',e=>{
+ e.preventDefault();
+ const target=e.target.closest('tr');
+ if(!draggedRow||!target||draggedRow===target||target.parentElement.id!=='tbody') return;
+ const rect=target.getBoundingClientRect();
+ target.parentNode.insertBefore(
+   draggedRow,
+   e.clientY > rect.top + rect.height/2 ? target.nextSibling : target
+ );
+});
+document.addEventListener('dragend',()=>{
+ if(draggedRow) draggedRow.style.opacity='1';
+ draggedRow=null;
+ recalc();
 });
 
 window.onload=()=>{
