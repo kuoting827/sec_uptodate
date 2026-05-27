@@ -100,8 +100,7 @@ summary{cursor:pointer}
 <table>
 <thead>
 <tr>
-<th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th>
-<th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>槓桿倍數</th><th></th>
+<th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th><th>排序</th><th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>槓桿倍數</th><th>刪除</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -148,6 +147,10 @@ function addRow(data={}){
  <td><input class="qty" type="number" value="${data.qty||1}"></td>
  <td><input class="cost" type="number" value="${data.cost||''}"></td>
  <td><input class="price" type="number" value="${data.price||''}"></td>
+ <td style="white-space:nowrap">
+   <button onclick="moveUp(this)" style="padding:2px 6px">▲</button>
+   <button onclick="moveDown(this)" style="padding:2px 6px">▼</button>
+ </td>
  <td class="mult">0</td>
  <td class="pnl">0</td>
  <td class="pos">0</td>
@@ -254,6 +257,18 @@ const marginEl=document.getElementById('margin');
  el.addEventListener('blur',()=>{formatMoneyInput(el);recalc();});
  el.addEventListener('input',recalc);
 });
+
+
+function moveUp(btn){
+ const row=btn.closest('tr');
+ const prev=row.previousElementSibling;
+ if(prev){ row.parentNode.insertBefore(row, prev); recalc(); }
+}
+function moveDown(btn){
+ const row=btn.closest('tr');
+ const next=row.nextElementSibling;
+ if(next){ row.parentNode.insertBefore(next, row); recalc(); }
+}
 
 window.onload=()=>{
  const saved=localStorage.getItem('futuresV41');
