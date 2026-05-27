@@ -68,6 +68,21 @@ font-weight:700!important;
 }
 summary{cursor:pointer}
 </style>
+
+<style>
+/* V5.4 Class-based column widths */
+.col-name{width:90px}
+.col-qty{width:28px}
+.col-cost{width:75px}
+.col-price{width:75px}
+.col-sort{width:45px}
+.col-mult{width:45px}
+.col-pnl{width:82px}
+.col-pos{width:110px}
+.col-lev{width:110px}
+.col-del{width:40px}
+</style>
+
 </head>
 <body>
 <h1>期貨部位追蹤表 V4.1 穩定版</h1>
@@ -100,7 +115,7 @@ summary{cursor:pointer}
 <table>
 <thead>
 <tr>
-<th>標的名稱</th><th>口數</th><th>成本價</th><th>現價</th><th>排序</th><th>一口點數</th><th>未實現損益</th><th>現貨部位</th><th>槓桿倍數</th><th>刪除</th>
+<th class="col-name">標的名稱</th><th class="col-qty">口數</th><th class="col-cost">成本價</th><th class="col-price">現價</th><th class="col-sort">排序</th><th class="col-mult">一口點數</th><th class="col-pnl">未實現損益</th><th class="col-pos">現貨部位</th><th class="col-lev">槓桿倍數</th><th class="col-del">刪除</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -143,19 +158,19 @@ function formatMoneyInput(el){
 function addRow(data={}){
  const tr=document.createElement('tr');
  tr.innerHTML=`
- <td><input class="name" value="${data.name||''}"></td>
- <td><input class="qty" type="number" value="${data.qty||1}"></td>
- <td><input class="cost" type="number" value="${data.cost||''}"></td>
- <td><input class="price" type="number" value="${data.price||''}"></td>
- <td style="white-space:nowrap">
+ <td class="col-name"><input class="name" value="${data.name||''}"></td>
+ <td class="col-qty"><input class="qty" type="number" value="${data.qty||1}"></td>
+ <td class="col-cost"><input class="cost" type="number" value="${data.cost||''}"></td>
+ <td class="col-price"><input class="price" type="number" value="${data.price||''}"></td>
+ <td class="col-sort" style="white-space:nowrap">
    <button onclick="moveUp(this)" style="padding:2px 6px">▲</button>
    <button onclick="moveDown(this)" style="padding:2px 6px">▼</button>
  </td>
- <td class="mult">0</td>
- <td class="pnl">0</td>
- <td class="pos">0</td>
- <td class="ratio">0%</td>
- <td><button onclick="this.closest('tr').remove();recalc()">✕</button></td>`;
+ <td class="mult col-mult">0</td>
+ <td class="pnl col-pnl">0</td>
+ <td class="pos col-pos">0</td>
+ <td class="ratio col-lev">0%</td>
+ <td class="col-del"><button onclick="this.closest('tr').remove();recalc()">✕</button></td>`;
  tr.querySelectorAll('input').forEach(i=>i.addEventListener('input',recalc));
  tbody.appendChild(tr);
  recalc();
