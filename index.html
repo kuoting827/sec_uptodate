@@ -141,13 +141,16 @@ function formatMoneyInput(el){
 }
 
 function addRow(data={}){
- const tr=document.createElement('tr'); tr.draggable=true;
+ const tr=document.createElement('tr');
  tr.innerHTML=`
  <td><input class="name" value="${data.name||''}"></td>
  <td><input class="qty" type="number" value="${data.qty||1}"></td>
  <td><input class="cost" type="number" value="${data.cost||''}"></td>
  <td><input class="price" type="number" value="${data.price||''}"></td>
- <td class="drag-handle" style="cursor:grab;font-size:18px">☰</td>
+ <td style="white-space:nowrap">
+   <button onclick="moveUp(this)" style="padding:2px 6px">▲</button>
+   <button onclick="moveDown(this)" style="padding:2px 6px">▼</button>
+ </td>
  <td class="mult">0</td>
  <td class="pnl">0</td>
  <td class="pos">0</td>
@@ -256,32 +259,16 @@ const marginEl=document.getElementById('margin');
 });
 
 
-let draggedRow=null;
-
-document.addEventListener('dragstart',e=>{
- const row=e.target.closest('tr');
- if(row && row.parentElement && row.parentElement.id==='tbody'){
-   draggedRow=row;
-   row.style.opacity='0.5';
- }
-});
-
-document.addEventListener('dragover',e=>{
- e.preventDefault();
- const target=e.target.closest('tr');
- if(!draggedRow||!target||draggedRow===target||target.parentElement.id!=='tbody') return;
- const rect=target.getBoundingClientRect();
- target.parentNode.insertBefore(
-   draggedRow,
-   e.clientY > rect.top + rect.height/2 ? target.nextSibling : target
- );
-});
-
-document.addEventListener('dragend',()=>{
- if(draggedRow) draggedRow.style.opacity='1';
- draggedRow=null;
- recalc();
-});
+function moveUp(btn){
+ const row=btn.closest('tr');
+ const prev=row.previousElementSibling;
+ if(prev){ row.parentNode.insertBefore(row, prev); recalc(); }
+}
+function moveDown(btn){
+ const row=btn.closest('tr');
+ const next=row.nextElementSibling;
+ if(next){ row.parentNode.insertBefore(next, row); recalc(); }
+}
 
 window.onload=()=>{
  const saved=localStorage.getItem('futuresV41');
